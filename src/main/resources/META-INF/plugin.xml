@@ -5,10 +5,17 @@
     <vendor email="xepozz@list.ru" url="https://github.com/xepozz">Dmitrii Derepko (@xepozz)</vendor>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lsp</depends>
+    <depends>com.intellij.modules.ultimate</depends>
 
     <resource-bundle>messages.HhvmBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
+        <fileType
+                name="HHVM"
+                language="Hack"
+                implementationClass="com.github.xepozz.hhvm.lang.HackFileType"
+                extensions="hack"/>
+        <platform.lsp.serverSupportProvider
+                implementation="com.github.xepozz.hhvm.lsp.HHVMLspServerSupportProvider"/>
     </extensions>
 </idea-plugin>
