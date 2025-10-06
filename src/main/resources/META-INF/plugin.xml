@@ -11,7 +11,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <fileType
-                name="HHVM"
+                name="Hack File"
                 language="Hack"
                 implementationClass="com.github.xepozz.hhvm.lang.HackFileType"
                 extensions="hack"/>
@@ -21,7 +21,7 @@
         <lang.syntaxHighlighterFactory
                 language="Hack"
                 implementationClass="com.github.xepozz.hhvm.lang.HackSyntaxHighlighterFactory"/>
-        <platform.lsp.serverSupportProvider
-                implementation="com.github.xepozz.hhvm.lsp.HHVMLspServerSupportProvider"/>
+<!--        <platform.lsp.serverSupportProvider-->
+<!--                implementation="com.github.xepozz.hhvm.lsp.HHVMLspServerSupportProvider"/>-->
     </extensions>
 </idea-plugin>

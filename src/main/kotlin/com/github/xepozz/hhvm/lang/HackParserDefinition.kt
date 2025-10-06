@@ -10,14 +10,13 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.FileViewProvider
 import com.intellij.psi.PsiElement
 import com.intellij.psi.tree.IFileElementType
-import com.intellij.psi.tree.TokenSet
 
 class HackParserDefinition : ParserDefinition {
     override fun createLexer(project: Project) = HackLexerAdapter()
 
     override fun getCommentTokens() = HackTokenSets.COMMENTS
 
-    override fun getWhitespaceTokens() = TokenSet.WHITE_SPACE
+    override fun getWhitespaceTokens() = HackTokenSets.WHITESPACES
 
     override fun getStringLiteralElements() = HackTokenSets.STRING_LITERALS
 

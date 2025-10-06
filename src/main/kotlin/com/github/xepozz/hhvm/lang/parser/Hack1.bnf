@@ -1,0 +1,49 @@
+{
+  parserClass="com.github.xepozz.hhvm.lang.parser.HackParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Hack"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.github.xepozz.hhvm.lang.psi"
+  psiImplPackage="com.github.xepozz.hhvm.lang.psi.impl"
+
+  elementTypeHolderClass="com.github.xepozz.hhvm.lang.psi.HackTypes"
+  elementTypeClass="com.github.xepozz.hhvm.lang.psi.HackElementType"
+  tokenTypeClass="com.github.xepozz.hhvm.lang.psi.HackTokenType"
+
+  psiImplUtilClass="com.github.xepozz.hhvm.lang.psi.impl.HackPsiImplUtil"
+}
+
+hackFile ::= item_*
+
+private item_ ::= (declaration | COMMENT | EOL)
+
+declaration ::= function
+{
+    recoverWhile=declaration_recover
+}
+private declaration_recover ::= !(';')
+
+function ::= 'async'? 'function' TEXT '(' ')' ':' TEXT '{' statements* '}'
+{
+    implements=["com.intellij.psi.NavigatablePsiElement"]
+    extends="com.github.xepozz.hhvm.lang.psi.impl.HackFunctionBaseImpl"
+    methods=[getReferences]
+}
+
+statements ::= statement*
+{
+    implements=["com.intellij.psi.NavigatablePsiElement"]
+//    extends="com.github.xepozz.hhvm.lang.psi.impl.HackFunctionBaseImpl"
+    methods=[getReferences]
+}
+
+statement ::= expr* ';'
+{
+    implements=["com.intellij.psi.NavigatablePsiElement"]
+//    extends="com.github.xepozz.hhvm.lang.psi.impl.HackFunctionBaseImpl"
+    methods=[getReferences]
+}
+
+expr ::= !(';')
