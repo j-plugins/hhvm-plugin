@@ -1,7 +1,9 @@
 {
   parserClass="com.github.xepozz.hhvm.lang.parser.HackParser"
 
-  extends(".*expression")=expression
+//    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+//    extends(".*statement")=statement
+    extends(".*expression")=expression
 
   psiClassPrefix="Hack"
   psiImplClassSuffix="Impl"
@@ -17,9 +19,9 @@
   tokens=[
     OPEN_TAG="regexp:'<?'[hH][hH]?"
     identifier="regexp:[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*"
-    EXPRESSION_TREE_IDENTIFIER="regexp:`'[^`]*'`"
-    comment="regexp:( '//' '.'* | '/*' [^*]*'*'+([^/*][^*]*'*'+)* '/' )"
-    float="regexp:( [0-9]+'.'[0-9]*([eE][+-]?[0-9]+)? | [0-9]*'.'[0-9]+([eE][+-]?[0-9]+)? | [0-9]+[eE][+-]?[0-9]+ )"
+    EXPRESSION_TREE_IDENTIFIER="regexp:`[^`]*`"
+    comment="regexp:( // .* | '/*' [^*]*'*'+([^/*][^*]*'*'+)* / )"
+    float="regexp:( [0-9]+\.[0-9]*([eE][+-]?[0-9]+)? | [0-9]*\.[0-9]+([eE][+-]?[0-9]+)? | [0-9]+[eE][+-]?[0-9]+ )"
     integer="regexp:( [1-9][0-9]* | '0'[0-7]* | '0'[xX][0-9a-fA-F]+ | '0'[bB][01]+ )"
     true="regexp:('true' | 'True'| 'TRUE')"
     false="regexp:('false' | 'False'| 'FALSE')"
@@ -36,12 +38,22 @@
     T_COLON=":"
     T_SEMICOLON=";"
     T_COMMA=","
+    T_DOT="."
     T_THREE_DOTS="..."
     T_LPAREN="("
     T_RPAREN=")"
     T_LBRACKET="["
     T_RBRACKET="]"
-    T_BACKSLASH="\\"
+    T_BACKSLASH='\'
+    T_GT_ET="=>"
+    T_PLUS="+"
+    T_PLUS_PLUS="++"
+    T_MINUS="-"
+    T_MINUS_MINUS="--"
+    T_QM="?"
+    T_EM="!"
+    T_DOLLAR="$"
+    T_DOLLAR_DOLLAR="$$"
 
     T_THROW="throw"
     T_RETURN="return"
@@ -141,6 +153,7 @@
     T_IMPLEMENTS="implements"
     T_CTX="ctx"
     T_FUNCTION="function"
+    T_LIST
 //    xhp_identifier_value="[a-zA-Z_][a-zA-Z0-9_]*([-:][a-zA-Z0-9_]+)*"
   ]
 }
@@ -151,11 +164,11 @@ hackFile ::=
 //identifier ::=
 //	 [a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*
 
-variable ::=
-	 ( '$' identifier )
+variable_expression ::=
+	 ( T_DOLLAR identifier )
 
-pipe_variable ::=
-	 '$$'
+pipe_variable_expression ::=
+	 T_DOLLAR_DOLLAR
 
 private keyword ::=
 	 T_TYPE
@@ -173,30 +186,30 @@ private keyword ::=
 	| primitive_type
 	| collection_type
 
-qualified_identifier ::=
+qualified_identifier_expression ::=
 	 ( identifier | T_NAMESPACE )? ( T_BACKSLASH identifier )+
 	| identifier
 
-scoped_identifier ::=
+scoped_identifier_expression ::=
 //	 ( qualified_identifier | variable | scope_identifier | xhp_identifier | pipe_variable ) '::' ( identifier | variable )
-	 ( qualified_identifier | variable | scope_identifier | pipe_variable ) '::' ( identifier | variable )
+	 ( qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression ) '::' ( identifier | variable_expression )
 
-scope_identifier ::=
+scope_identifier_expression ::=
 	 T_SELF
 	| T_PARENT
 	| T_STATIC
 
-private variablish ::=
-	 variable
-	| pipe_variable
+private variablish_expression ::=
+	 variable_expression
+	| pipe_variable_expression
 	| list_expression
 	| subscript_expression
-	| qualified_identifier
+	| qualified_identifier_expression
 	| parenthesized_expression
-	| call_expression
-	| scoped_identifier
-	| scope_identifier
-	| selection_expression
+//	| call_expression
+	| scoped_identifier_expression
+	| scope_identifier_expression
+//	| selection_expression
 //	| xhp_identifier
 
 private statement ::=
@@ -235,7 +248,7 @@ private declaration ::=
 	| const_declaration
 
 module_attribute ::=
-	 T_LT_LT identifier T_COLON qualified_identifier arguments? ( T_COMMA qualified_identifier arguments? )* T_COMMA? T_GT_GT
+	 T_LT_LT identifier T_COLON qualified_identifier_expression arguments? ( T_COMMA qualified_identifier_expression arguments? )* T_COMMA? T_GT_GT
 
 //heredoc ::=
 //	 '<<<' heredoc_start heredoc_start_newline? ( heredoc_body | variable | embedded_braced_expression )* heredoc_end_newline? heredoc_end
@@ -248,15 +261,14 @@ braced_expression ::=
 
 expression ::=
 //	 heredoc
-//	| array
-	array
-	| tuple
-	| shape
-	| collection
-	| literal
-	| variablish
-	| expression_tree
-	| prefixed_string
+	array_expression
+	| tuple_expression
+	| shape_expression
+	| collection_expression
+	| literal_expression
+	| variablish_expression
+	| expression_tree_expression
+	| prefixed_string_expression
 	| parenthesized_expression
 	| binary_expression
 	| prefix_unary_expression
@@ -268,16 +280,16 @@ expression ::=
 	| cast_expression
 	| ternary_expression
 	| lambda_expression
-	| call_expression
-	| selection_expression
+//	| call_expression
+//	| selection_expression
 	| new_expression
 	| include_expression
 	| require_expression
 	| anonymous_function_expression
 //	| xhp_expression
-	| function_pointer
-	| enum_class_label
-  {extraRoot=true}
+	| function_pointer_expression
+	| enum_class_label_expression
+//  {extraRoot=true}
 
 empty_statement ::=
 	 T_SEMICOLON
@@ -304,7 +316,7 @@ echo_statement ::=
 	 T_ECHO expression ( T_COMMA expression )* T_SEMICOLON
 
 unset_statement ::=
-	 T_UNSET T_LPAREN ( variablish ( T_COMMA variablish )* )? T_RPAREN T_SEMICOLON
+	 T_UNSET T_LPAREN ( variablish_expression ( T_COMMA variablish_expression )* )? T_RPAREN T_SEMICOLON
 
 concurrent_statement ::=
 	 T_CONCURRENT compound_statement
@@ -322,7 +334,7 @@ use_clause ::=
 	 use_type? namespace_identifier ( T_AS identifier )?
 
 private namespace_identifier ::=
-	 qualified_identifier T_BACKSLASH?
+	 qualified_identifier_expression T_BACKSLASH?
 	| T_BACKSLASH
 
 if_statement ::=
@@ -338,7 +350,7 @@ switch_default ::=
 	 T_DEFAULT T_COLON statement*
 
 foreach_statement ::=
-	 T_FOREACH T_LPAREN expression await_modifier? T_AS ( variablish '=>' )? variablish T_RPAREN statement
+	 T_FOREACH T_LPAREN expression await_modifier? T_AS ( variablish_expression T_GT_ET )? variablish_expression T_RPAREN statement
 
 while_statement ::=
 	 T_WHILE parenthesized_expression statement
@@ -353,7 +365,7 @@ try_statement ::=
 	 T_TRY compound_statement catch_clause* ( catch_clause | finally_clause )
 
 catch_clause ::=
-	 T_CATCH T_LPAREN type variable T_RPAREN compound_statement
+	 T_CATCH T_LPAREN type variable_expression T_RPAREN compound_statement
 
 finally_clause ::=
 	 T_FINALLY compound_statement
@@ -361,42 +373,18 @@ finally_clause ::=
 using_statement ::=
 	 await_modifier? T_USING ( expression_statement | T_LPAREN expression ( T_COMMA expression )* T_RPAREN ( compound_statement | T_SEMICOLON ) )
 
-private literal ::=
+literal_expression ::=
 	 string
 	| integer
 	| float
 	| true
 	| false
 	| null
-//
-//float ::=
-//	 ( [0-9]+'.'[0-9]*([eE][+-]?[0-9]+)? | [0-9]*'.'[0-9]+([eE][+-]?[0-9]+)? | [0-9]+[eE][+-]?[0-9]+ )
-//
-//integer ::=
-//	 ( [1-9][0-9]* | '0'[0-7]* | '0'[xX][0-9a-fA-F]+ | '0'[bB][01]+ )
-//
-//true ::=
-//	 'true'
-//	| 'True'
-//	| 'TRUE'
-//
-//false ::=
-//	 'false'
-//	| 'False'
-//	| 'FALSE'
-//
-//null ::=
-//	 'null'
-//	| 'Null'
-//	| 'NULL'
-//
-//string ::=
-//	 ( "'"("\'"|"\\"|"\"?[^'\])*"'" | '"T_LPAREN\"'|'\\'|'\'?[^"\])*'"' )
 
-expression_tree ::=
+expression_tree_expression ::=
 	 identifier EXPRESSION_TREE_IDENTIFIER
 
-prefixed_string ::=
+prefixed_string_expression ::=
 	 identifier string
 
 private type ::=
@@ -407,12 +395,12 @@ private type ::=
 	| tuple_type_specifier
 
 type_specifier ::=
+	 type_modifier* ( primitive_type | qualified_identifier_expression | collection_type ) type_arguments?
 //	 type_modifier* ( primitive_type | qualified_identifier | collection_type | xhp_identifier ) type_arguments?
-	 type_modifier* ( primitive_type | qualified_identifier | collection_type ) type_arguments?
 
 private type_modifier ::=
 	 '@'
-	| '?'
+	| T_QM
 	| '~'
 
 tuple_type_specifier ::=
@@ -426,13 +414,14 @@ shape_type_specifier ::=
 	 type_modifier* T_SHAPE T_LPAREN ( ( field_specifier | T_THREE_DOTS ) ( T_COMMA ( field_specifier | T_THREE_DOTS ) )* T_COMMA? )? T_RPAREN
 
 field_specifier ::=
-	 '?'? expression '=>' type
+	 T_QM? expression T_GT_ET type
 
 type_constant ::=
-	 type_modifier* type_constant_inner
+	 type_modifier+
+//	 type_modifier* type_constant_inner
 
-private type_constant_inner ::=
-	 ( qualified_identifier | type_constant ) '::' identifier
+//private type_constant_inner ::=
+//	 ( qualified_identifier | type_constant ) '::' identifier
 
 private collection_type ::=
 	 T_ARRAY
@@ -465,7 +454,7 @@ type_parameters ::=
 	 T_LT type_parameter ( T_COMMA type_parameter )* T_COMMA? T_GT
 
 type_parameter ::=
-	 attribute_modifier? ( '+' | '-' | T_REIFY )? identifier ( ( T_AS | T_SUPER ) type )*
+	 attribute_modifier? ( T_PLUS | T_MINUS | T_REIFY )? identifier ( ( T_AS | T_SUPER ) type )*
 
 where_clause ::=
 	 T_WHERE ( where_constraint T_COMMA? )+
@@ -473,23 +462,23 @@ where_clause ::=
 where_constraint ::=
 	 type ( T_AS | T_SUPER | T_EQ ) type
 
-array ::=
+array_expression ::=
 	 collection_type type_arguments? T_LBRACKET ( ( expression | element_initializer ) ( T_COMMA ( expression | element_initializer ) )* T_COMMA? )? T_RBRACKET
 
 element_initializer ::=
-	 expression '=>' expression
+	 expression T_GT_ET expression
 
-tuple ::=
+tuple_expression ::=
 	 T_TUPLE T_LPAREN ( expression ( T_COMMA expression )* T_COMMA? )? T_RPAREN
 
-shape ::=
+shape_expression ::=
 	 T_SHAPE T_LPAREN ( field_initializer ( T_COMMA field_initializer )* T_COMMA? )? T_RPAREN
 
 field_initializer ::=
-	 ( string | scoped_identifier ) '=>' expression
+	 ( string | scoped_identifier_expression ) T_GT_ET expression
 
-collection ::=
-	 qualified_identifier type_arguments? T_LBRACE ( ( expression | element_initializer ) ( T_COMMA ( expression | element_initializer ) )* T_COMMA? )? T_RBRACE
+collection_expression ::=
+	 qualified_identifier_expression type_arguments? T_LBRACE ( ( expression | element_initializer ) ( T_COMMA ( expression | element_initializer ) )* T_COMMA? )? T_RBRACE
 
 include_expression ::=
 	 ( T_INCLUDE | T_INCLUDE_ONCE ) expression
@@ -504,64 +493,64 @@ subscript_expression ::=
 	 expression T_LBRACKET expression? T_RBRACKET
 
 list_expression ::=
-	 'list' T_LPAREN expression? ( T_COMMA expression? )* T_COMMA? T_RPAREN
+	 T_LIST T_LPAREN expression? ( T_COMMA expression? )* T_COMMA? T_RPAREN
 
 binary_expression ::=
-	 expression '|>' expression
-	| expression '??' expression
-	| expression '||' expression
-	| expression '&&' expression
-	| expression '|' expression
-	| expression '^' expression
-	| expression '&' expression
-	| expression '==' expression
-	| expression '!=' expression
-	| expression '===' expression
-	| expression '!==' expression
-	| expression T_LT expression
-	| expression T_GT expression
-	| expression '<=' expression
-	| expression '>=' expression
-	| expression '<=>' expression
-	| expression T_LT_LT expression
-	| expression T_GT_GT expression
-	| expression '+' expression
-	| expression '-' expression
-	| expression '.' expression
-	| expression '*' expression
-	| expression '/' expression
-	| expression '%' expression
-	| expression '**' expression
-	| expression '?:' expression
-	| expression T_EQ expression
-	| expression '??=' expression
-	| expression '.=' expression
-	| expression '|=' expression
-	| expression '^=' expression
-	| expression '&=' expression
-	| expression '<<=' expression
-	| expression '>>=' expression
-	| expression '+=' expression
-	| expression '-=' expression
-	| expression '*=' expression
-	| expression '/=' expression
-	| expression '%=' expression
-	| expression '**=' expression
+	 expression ('|>'
+	 | '??'
+	 | '||'
+	 | '&&'
+	 | '|'
+	 | '^'
+	 | '&'
+	 | '=='
+	 | '!='
+	 | '==='
+	 | '!=='
+	 | T_LT
+	 | T_GT
+	 | '<='
+	 | '>='
+	 | '<=>'
+	 | T_LT_LT
+	 | T_GT_GT
+	 | T_PLUS
+	 | T_MINUS
+	 | T_DOT
+	 | '*'
+	 | '/'
+	 | '%'
+	 | '**'
+	 | '?:'
+	 | T_EQ
+	 | '??='
+	 | '.='
+	 | '|='
+	 | '^='
+	 | '&='
+	 | '<<='
+	 | '>>='
+	 | '+='
+	 | '-='
+	 | '*='
+	 | '/='
+	 | '%='
+	 | '**=') expression
 
 prefix_unary_expression ::=
-	 '!' expression
+	 T_EM expression
 	| '~' expression
-	| '-' expression
-	| '+' expression
-	| '++' expression
-	| '--' expression
+	| T_MINUS expression
+	| T_PLUS expression
+	| T_PLUS_PLUS expression
+	| T_MINUS_MINUS expression
 	| T_PRINT expression
 	| T_CLONE expression
 	| T_AWAIT expression
 	| '@' expression
 
 postfix_unary_expression ::=
-	 expression ( '++' | '--' )
+	 expression ( T_PLUS_PLUS | T_MINUS_MINUS )
 
 is_expression ::=
 	 expression T_IS type
@@ -579,7 +568,7 @@ cast_expression ::=
 	 T_LPAREN ( T_ARRAY | T_INT | T_FLOAT | T_STRING | T_BOOL ) T_RPAREN expression
 
 ternary_expression ::=
-	 expression '?' expression T_COLON expression
+	 expression T_QM expression T_COLON expression
 
 lambda_expression ::=
 	 attribute_modifier? async_modifier? ( single_parameter_parameters | parameters capability_list? ( T_COLON type )? ) '==>' ( expression | compound_statement )
@@ -588,13 +577,17 @@ private single_parameter_parameters ::=
 	 single_parameter
 
 private single_parameter ::=
-	 variable
+	 variable_expression
 
-call_expression ::=
-	 ( expression | collection_type ) type_arguments? arguments
+//call_expression ::=
+//	 ( expression | collection_type ) type_arguments? arguments
+
+//call_expression ::=
+//	 (collection_type type_arguments? arguments)
+//	 | (expression type_arguments? arguments)
 
 new_expression ::=
-	 T_NEW variablish type_arguments? arguments
+	 T_NEW variablish_expression type_arguments? arguments
 
 arguments ::=
 	 T_LPAREN ( argument ( T_COMMA argument )* T_COMMA? )? T_RPAREN
@@ -602,8 +595,8 @@ arguments ::=
 argument ::=
 	 ( inout_modifier | variadic_modifier )? expression
 
-selection_expression ::=
-	 ( variablish | as_expression ) ( '?->' | '->' ) ( variablish | braced_expression | keyword )
+//selection_expression ::=
+//	 ( variablish_expression | as_expression ) ( '?->' | '->' ) ( variablish_expression | braced_expression | keyword )
 
 alias_declaration ::=
 	 attribute_modifier? ( T_TYPE | T_NEWTYPE ) identifier type_parameters? ( T_AS type )? T_EQ type T_SEMICOLON
@@ -619,14 +612,14 @@ capability_list ::=
 
 capability ::=
 	 identifier type_parameters?
-	| scoped_identifier
-	| T_CTX variable
+	| scoped_identifier_expression
+	| T_CTX variable_expression
 
 parameters ::=
 	 T_LPAREN ( variadic_modifier | parameter ( T_COMMA parameter )* T_COMMA? )? T_RPAREN
 
 parameter ::=
-	 attribute_modifier? visibility_modifier? inout_modifier? type? variadic_modifier? variable ( T_EQ expression )?
+	 attribute_modifier? visibility_modifier? inout_modifier? type? variadic_modifier? variable_expression ( T_EQ expression )?
 
 trait_declaration ::=
 	 attribute_modifier? T_TRAIT identifier type_parameters? implements_clause? where_clause? member_declarations
@@ -646,7 +639,7 @@ trait_use_clause ::=
 	 T_USE type ( T_COMMA type )* ( T_LBRACE ( ( trait_select_clause | trait_alias_clause ) T_SEMICOLON )* T_RBRACE | T_SEMICOLON )
 
 trait_select_clause ::=
-	 qualified_identifier '::' identifier T_INSTEADOF qualified_identifier ( T_COMMA qualified_identifier )*
+	 qualified_identifier_expression '::' identifier T_INSTEADOF qualified_identifier_expression ( T_COMMA qualified_identifier_expression )*
 
 trait_alias_clause ::=
 	 identifier T_AS ( visibility_modifier identifier? | visibility_modifier? identifier )
@@ -688,7 +681,7 @@ property_declaration ::=
 	 attribute_modifier? member_modifier* type? property_declarator ( T_COMMA property_declarator )* T_SEMICOLON
 
 property_declarator ::=
-	 variable ( T_EQ expression )?
+	 variable_expression ( T_EQ expression )?
 
 enum_declaration ::=
 	 attribute_modifier? T_ENUM identifier T_COLON type ( T_AS type )? T_LBRACE enumerator* T_RBRACE
@@ -699,8 +692,8 @@ abstract_enum_class_declaration ::=
 enum_class_declaration ::=
 	 attribute_modifier? T_ENUM T_CLASS identifier T_COLON type extends_clause? T_LBRACE typed_enumerator* T_RBRACE
 
-enum_class_label ::=
-	 qualified_identifier? '#' identifier
+enum_class_label_expression ::=
+	 qualified_identifier_expression? '#' identifier
 
 enumerator ::=
 	 identifier T_EQ expression T_SEMICOLON
@@ -709,7 +702,7 @@ typed_enumerator ::=
 	 type enumerator
 
 namespace_declaration ::=
-	 T_NAMESPACE ( qualified_identifier T_SEMICOLON | qualified_identifier? compound_statement )?
+	 T_NAMESPACE ( qualified_identifier_expression T_SEMICOLON | qualified_identifier_expression? compound_statement )?
 
 private member_modifier ::=
 	 visibility_modifier
@@ -740,7 +733,7 @@ visibility_modifier ::=
 	| T_INTERNAL
 
 attribute_modifier ::=
-	 T_LT_LT qualified_identifier arguments? ( T_COMMA qualified_identifier arguments? )* T_COMMA? T_GT_GT
+	 T_LT_LT qualified_identifier_expression arguments? ( T_COMMA qualified_identifier_expression arguments? )* T_COMMA? T_GT_GT
 
 inout_modifier ::=
 	 T_INOUT
@@ -772,7 +765,7 @@ await_modifier ::=
 //	| xhp_open ( xhp_string | xhp_comment | braced_expression | xhp_expression )* xhp_close
 //
 //xhp_comment ::=
-//	 ( '<!--' ('-'?T_GT)?([^>]|[^-]T_GT|[^-]'->')* '-->' )
+//	 ( '<!--' (T_MINUS?T_GT)?([^>]|[^-]T_GT|[^-]'->')* '-->' )
 //
 //xhp_string ::=
 //	 [^<{]+
@@ -811,17 +804,14 @@ await_modifier ::=
 //	| xhp_postfix_unary_expression
 //	| xhp_parenthesized_expression
 
-function_pointer ::=
-	 ( scoped_identifier | qualified_identifier ) type_arguments
-
-//comment ::=
-//	 ( '//' '.'* | '/*' [^*]*'*'+([^/*][^*]*'*'+)* '/' )
+function_pointer_expression ::=
+	 ( scoped_identifier_expression | qualified_identifier_expression ) type_arguments
 
 anonymous_function_expression ::=
 	 async_modifier? T_FUNCTION parameters capability_list? ( T_COLON type )? anonymous_function_use_clause? compound_statement
 
 private anonymous_function_use_clause ::=
-	 T_USE T_LPAREN variable ( T_COMMA variable )* T_COMMA? T_RPAREN
+	 T_USE T_LPAREN variable_expression ( T_COMMA variable_expression )* T_COMMA? T_RPAREN
 
 //xhp_children_declaration ::=
 //	 'children' xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_SEMICOLON
@@ -833,7 +823,7 @@ private anonymous_function_use_clause ::=
 //	 xhp_attribute_expression '|' xhp_attribute_expression
 //
 //private xhp_postfix_unary_expression ::=
-//	 xhp_attribute_expression ( '+' | '*' | '?' )
+//	 xhp_attribute_expression ( T_PLUS | '*' | T_QM )
 //
 //private xhp_parenthesized_expression ::=
 //	 T_LPAREN xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_RPAREN

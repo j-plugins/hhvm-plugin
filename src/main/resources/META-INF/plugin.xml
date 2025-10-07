@@ -21,6 +21,9 @@
         <lang.syntaxHighlighterFactory
                 language="Hack"
                 implementationClass="com.github.xepozz.hhvm.lang.HackSyntaxHighlighterFactory"/>
+        <lang.syntaxHighlighter
+                language="Hack"
+                implementationClass="com.github.xepozz.hhvm.lang.HackSyntaxHighlighterFactory"/>
 <!--        <platform.lsp.serverSupportProvider-->
 <!--                implementation="com.github.xepozz.hhvm.lsp.HHVMLspServerSupportProvider"/>-->
     </extensions>
