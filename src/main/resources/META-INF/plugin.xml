@@ -30,5 +30,8 @@
         <annotator
                 language="Hack"
                 implementationClass="com.github.xepozz.hhvm.lang.HackAnnotator"/>
+        <platform.lsp.serverSupportProvider
+                implementation="com.github.xepozz.hhvm.lsp.HHVMLspServerSupportProvider"/>
+
     </extensions>
 </idea-plugin>
