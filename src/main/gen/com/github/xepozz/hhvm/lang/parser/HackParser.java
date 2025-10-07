@@ -2912,14 +2912,13 @@ public class HackParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // qualified_identifier_expression '::' identifier T_INSTEADOF qualified_identifier_expression ( T_COMMA qualified_identifier_expression )*
+  // qualified_identifier_expression T_COLON_COLON identifier T_INSTEADOF qualified_identifier_expression ( T_COMMA qualified_identifier_expression )*
   public static boolean trait_select_clause(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "trait_select_clause")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, TRAIT_SELECT_CLAUSE, "<trait select clause>");
     r = qualified_identifier_expression(b, l + 1);
-    r = r && consumeToken(b, "::");
-    r = r && consumeTokens(b, 0, IDENTIFIER, T_INSTEADOF);
+    r = r && consumeTokens(b, 0, T_COLON_COLON, IDENTIFIER, T_INSTEADOF);
     r = r && qualified_identifier_expression(b, l + 1);
     r = r && trait_select_clause_5(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -3304,15 +3303,15 @@ public class HackParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '@'
+  // T_AT
   // 	| T_QM
-  // 	| '~'
+  // 	| T_TILDA
   static boolean type_modifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_modifier")) return false;
     boolean r;
-    r = consumeToken(b, "@");
+    r = consumeToken(b, T_AT);
     if (!r) r = consumeToken(b, T_QM);
-    if (!r) r = consumeToken(b, "~");
+    if (!r) r = consumeToken(b, T_TILDA);
     return r;
   }
 
@@ -4541,13 +4540,13 @@ public class HackParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ( qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression ) '::' ( identifier | variable_expression )
+  // ( qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression ) T_COLON_COLON ( identifier | variable_expression )
   public static boolean scoped_identifier_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "scoped_identifier_expression")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SCOPED_IDENTIFIER_EXPRESSION, "<scoped identifier expression>");
     r = scoped_identifier_expression_0(b, l + 1);
-    r = r && consumeToken(b, "::");
+    r = r && consumeToken(b, T_COLON_COLON);
     r = r && scoped_identifier_expression_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -4587,7 +4586,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // ('?->' | '->') (variablish_expression | braced_expression | keyword)
+  // (T_CHAIN_OPTIONAL | T_CHAIN) (variablish_expression | braced_expression | keyword)
   private static boolean selection_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "selection_expression_0")) return false;
     boolean r;
@@ -4598,12 +4597,12 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '?->' | '->'
+  // T_CHAIN_OPTIONAL | T_CHAIN
   private static boolean selection_expression_0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "selection_expression_0_0")) return false;
     boolean r;
-    r = consumeTokenSmart(b, "?->");
-    if (!r) r = consumeTokenSmart(b, "->");
+    r = consumeTokenSmart(b, T_CHAIN_OPTIONAL);
+    if (!r) r = consumeTokenSmart(b, T_CHAIN);
     return r;
   }
 
@@ -4640,93 +4639,93 @@ public class HackParser implements PsiParser, LightPsiParser {
   }
 
   // '|>'
-  // 	 | '??'
-  // 	 | '||'
-  // 	 | '&&'
-  // 	 | '|'
-  // 	 | '^'
-  // 	 | '&'
-  // 	 | '=='
-  // 	 | '!='
-  // 	 | '==='
-  // 	 | '!=='
+  // 	 | T_QQ
+  // 	 | T_OR
+  // 	 | T_AND
+  // 	 | T_BIT_OR
+  // 	 | T_BIT_NOT
+  // 	 | T_BIT_AND
+  // 	 | T_EQ_EQ
+  // 	 | T_NEQ
+  // 	 | T_EQ_STRICT
+  // 	 | T_NEQ_STRICT
   // 	 | T_LT
   // 	 | T_GT
-  // 	 | '<='
-  // 	 | '>='
-  // 	 | '<=>'
+  // 	 | T_LT_EQ
+  // 	 | T_GT_EQ
+  // 	 | T_SPASESHIP
   // 	 | T_LT_LT
   // 	 | T_GT_GT
   // 	 | T_PLUS
   // 	 | T_MINUS
   // 	 | T_DOT
-  // 	 | '*'
-  // 	 | '/'
-  // 	 | '%'
-  // 	 | '**'
-  // 	 | '?:'
+  // 	 | T_MUL
+  // 	 | T_DIV
+  // 	 | T_PERCENT
+  // 	 | T_POW
+  // 	 | T_OR_VALUE
   // 	 | T_EQ
-  // 	 | '??='
-  // 	 | '.='
-  // 	 | '|='
-  // 	 | '^='
-  // 	 | '&='
-  // 	 | '<<='
-  // 	 | '>>='
-  // 	 | '+='
-  // 	 | '-='
-  // 	 | '*='
-  // 	 | '/='
-  // 	 | '%='
-  // 	 | '**='
+  // 	 | T_OR_VALUE_ASSIGN
+  // 	 | T_APPEND_ASSIGN
+  // 	 | T_BIT_OR_ASSIGN
+  // 	 | T_BIT_NOT_ASSIGN
+  // 	 | T_BIT_AND_ASSIGN
+  // 	 | T_BIT_MUL_ASSIGN
+  // 	 | T_BIT_DIV_ASSIGN
+  // 	 | T_PLUS_ASSIGN
+  // 	 | T_MINUS_ASSIGN
+  // 	 | T_MUL_ASSIGN
+  // 	 | T_DIV_ASSIGN
+  // 	 | T_PERCENT_ASSIGN
+  // 	 | T_POW_ASSIGN
   private static boolean binary_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binary_expression_0")) return false;
     boolean r;
     r = consumeTokenSmart(b, "|>");
-    if (!r) r = consumeTokenSmart(b, "??");
-    if (!r) r = consumeTokenSmart(b, "||");
-    if (!r) r = consumeTokenSmart(b, "&&");
-    if (!r) r = consumeTokenSmart(b, "|");
-    if (!r) r = consumeTokenSmart(b, "^");
-    if (!r) r = consumeTokenSmart(b, "&");
-    if (!r) r = consumeTokenSmart(b, "==");
-    if (!r) r = consumeTokenSmart(b, "!=");
-    if (!r) r = consumeTokenSmart(b, "===");
-    if (!r) r = consumeTokenSmart(b, "!==");
+    if (!r) r = consumeTokenSmart(b, T_QQ);
+    if (!r) r = consumeTokenSmart(b, T_OR);
+    if (!r) r = consumeTokenSmart(b, T_AND);
+    if (!r) r = consumeTokenSmart(b, T_BIT_OR);
+    if (!r) r = consumeTokenSmart(b, T_BIT_NOT);
+    if (!r) r = consumeTokenSmart(b, T_BIT_AND);
+    if (!r) r = consumeTokenSmart(b, T_EQ_EQ);
+    if (!r) r = consumeTokenSmart(b, T_NEQ);
+    if (!r) r = consumeTokenSmart(b, T_EQ_STRICT);
+    if (!r) r = consumeTokenSmart(b, T_NEQ_STRICT);
     if (!r) r = consumeTokenSmart(b, T_LT);
     if (!r) r = consumeTokenSmart(b, T_GT);
-    if (!r) r = consumeTokenSmart(b, "<=");
-    if (!r) r = consumeTokenSmart(b, ">=");
-    if (!r) r = consumeTokenSmart(b, "<=>");
+    if (!r) r = consumeTokenSmart(b, T_LT_EQ);
+    if (!r) r = consumeTokenSmart(b, T_GT_EQ);
+    if (!r) r = consumeTokenSmart(b, T_SPASESHIP);
     if (!r) r = consumeTokenSmart(b, T_LT_LT);
     if (!r) r = consumeTokenSmart(b, T_GT_GT);
     if (!r) r = consumeTokenSmart(b, T_PLUS);
     if (!r) r = consumeTokenSmart(b, T_MINUS);
     if (!r) r = consumeTokenSmart(b, T_DOT);
-    if (!r) r = consumeTokenSmart(b, "*");
-    if (!r) r = consumeTokenSmart(b, "/");
-    if (!r) r = consumeTokenSmart(b, "%");
-    if (!r) r = consumeTokenSmart(b, "**");
-    if (!r) r = consumeTokenSmart(b, "?:");
+    if (!r) r = consumeTokenSmart(b, T_MUL);
+    if (!r) r = consumeTokenSmart(b, T_DIV);
+    if (!r) r = consumeTokenSmart(b, T_PERCENT);
+    if (!r) r = consumeTokenSmart(b, T_POW);
+    if (!r) r = consumeTokenSmart(b, T_OR_VALUE);
     if (!r) r = consumeTokenSmart(b, T_EQ);
-    if (!r) r = consumeTokenSmart(b, "??=");
-    if (!r) r = consumeTokenSmart(b, ".=");
-    if (!r) r = consumeTokenSmart(b, "|=");
-    if (!r) r = consumeTokenSmart(b, "^=");
-    if (!r) r = consumeTokenSmart(b, "&=");
-    if (!r) r = consumeTokenSmart(b, "<<=");
-    if (!r) r = consumeTokenSmart(b, ">>=");
-    if (!r) r = consumeTokenSmart(b, "+=");
-    if (!r) r = consumeTokenSmart(b, "-=");
-    if (!r) r = consumeTokenSmart(b, "*=");
-    if (!r) r = consumeTokenSmart(b, "/=");
-    if (!r) r = consumeTokenSmart(b, "%=");
-    if (!r) r = consumeTokenSmart(b, "**=");
+    if (!r) r = consumeTokenSmart(b, T_OR_VALUE_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_APPEND_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_BIT_OR_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_BIT_NOT_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_BIT_AND_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_BIT_MUL_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_BIT_DIV_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_PLUS_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_MINUS_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_MUL_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_DIV_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_PERCENT_ASSIGN);
+    if (!r) r = consumeTokenSmart(b, T_POW_ASSIGN);
     return r;
   }
 
   // T_EM expression
-  // 	| '~' expression
+  // 	| T_TILDA expression
   // 	| T_MINUS expression
   // 	| T_PLUS expression
   // 	| T_PLUS_PLUS expression
@@ -4734,7 +4733,7 @@ public class HackParser implements PsiParser, LightPsiParser {
   // 	| T_PRINT expression
   // 	| T_CLONE expression
   // 	| T_AWAIT expression
-  // 	| '@' expression
+  // 	| T_AT expression
   public static boolean prefix_unary_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefix_unary_expression")) return false;
     boolean r;
@@ -4764,12 +4763,12 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '~' expression
+  // T_TILDA expression
   private static boolean prefix_unary_expression_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefix_unary_expression_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, "~");
+    r = consumeTokenSmart(b, T_TILDA);
     r = r && expression(b, l + 1, -1);
     exit_section_(b, m, null, r);
     return r;
@@ -4852,12 +4851,12 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '@' expression
+  // T_AT expression
   private static boolean prefix_unary_expression_9(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "prefix_unary_expression_9")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokenSmart(b, "@");
+    r = consumeTokenSmart(b, T_AT);
     r = r && expression(b, l + 1, -1);
     exit_section_(b, m, null, r);
     return r;
@@ -4983,7 +4982,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // attribute_modifier? async_modifier? ( single_parameter_parameters | parameters capability_list? ( T_COLON type )? ) '==>' ( expression | compound_statement )
+  // attribute_modifier? async_modifier? ( single_parameter_parameters | parameters capability_list? ( T_COLON type )? ) T_LAMBDA ( expression | compound_statement )
   public static boolean lambda_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "lambda_expression")) return false;
     boolean r;
@@ -4991,7 +4990,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     r = lambda_expression_0(b, l + 1);
     r = r && lambda_expression_1(b, l + 1);
     r = r && lambda_expression_2(b, l + 1);
-    r = r && consumeToken(b, "==>");
+    r = r && consumeToken(b, T_LAMBDA);
     r = r && lambda_expression_4(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -5217,14 +5216,13 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // qualified_identifier_expression? '#' identifier
+  // qualified_identifier_expression? T_SHARP identifier
   public static boolean enum_class_label_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "enum_class_label_expression")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ENUM_CLASS_LABEL_EXPRESSION, "<enum class label expression>");
     r = enum_class_label_expression_0(b, l + 1);
-    r = r && consumeToken(b, "#");
-    r = r && consumeToken(b, IDENTIFIER);
+    r = r && consumeTokensSmart(b, 0, T_SHARP, IDENTIFIER);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

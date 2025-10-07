@@ -39,6 +39,7 @@
     T_LBRACE="{"
     T_RBRACE="}"
     T_COLON=":"
+    T_COLON_COLON="::"
     T_SEMICOLON=";"
     T_COMMA=","
     T_DOT="."
@@ -48,6 +49,7 @@
     T_LBRACKET="["
     T_RBRACKET="]"
     T_BACKSLASH='\'
+    T_LAMBDA="==>"
     T_GT_ET="=>"
     T_PLUS="+"
     T_PLUS_PLUS="++"
@@ -57,6 +59,42 @@
     T_EM="!"
     T_DOLLAR="$"
     T_DOLLAR_DOLLAR="$$"
+    T_QQ="??"
+    T_OR="||"
+    T_AND="&&"
+    T_BIT_OR="|"
+    T_BIT_NOT="^"
+    T_BIT_AND="&"
+    T_EQ_EQ="=="
+    T_NEQ="!="
+    T_EQ_STRICT="==="
+    T_NEQ_STRICT="!=="
+    T_LT_EQ="<="
+    T_GT_EQ=">="
+    T_SPASESHIP="<=>"
+    T_MUL="*"
+    T_DIV="/"
+    T_PERCENT="%"
+    T_POW="**"
+    T_OR_VALUE="?:"
+    T_OR_VALUE_ASSIGN="??="
+    T_APPEND_ASSIGN=".="
+    T_BIT_OR_ASSIGN="|="
+    T_BIT_NOT_ASSIGN="^="
+    T_BIT_AND_ASSIGN="&="
+    T_BIT_MUL_ASSIGN="<<="
+    T_BIT_DIV_ASSIGN=">>="
+    T_PLUS_ASSIGN="+="
+    T_MINUS_ASSIGN="-="
+    T_MUL_ASSIGN="*="
+    T_DIV_ASSIGN="/="
+    T_PERCENT_ASSIGN="%="
+    T_POW_ASSIGN="**="
+    T_AT="@"
+    T_TILDA="~"
+    T_CHAIN_OPTIONAL="?->"
+    T_CHAIN="->"
+    T_SHARP="#"
 
     T_THROW="throw"
     T_RETURN="return"
@@ -194,8 +232,8 @@ qualified_identifier_expression ::=
 	| identifier
 
 scoped_identifier_expression ::=
-//	 ( qualified_identifier | variable | scope_identifier | xhp_identifier | pipe_variable ) '::' ( identifier | variable )
-	 ( qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression ) '::' ( identifier | variable_expression )
+//	 ( qualified_identifier | variable | scope_identifier | xhp_identifier | pipe_variable ) T_COLON_COLON ( identifier | variable )
+	 ( qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression ) T_COLON_COLON ( identifier | variable_expression )
 
 scope_identifier_expression ::=
 	 T_SELF
@@ -404,9 +442,9 @@ type_specifier ::=
 //	 type_modifier* ( primitive_type | qualified_identifier | collection_type | xhp_identifier ) type_arguments?
 
 private type_modifier ::=
-	 '@'
+	 T_AT
 	| T_QM
-	| '~'
+	| T_TILDA
 
 tuple_type_specifier ::=
 	 type_modifier* T_LPAREN type ( T_COMMA type )* T_COMMA? T_RPAREN
@@ -426,7 +464,7 @@ type_constant ::=
 //	 type_modifier* type_constant_inner
 
 //private type_constant_inner ::=
-//	 ( qualified_identifier | type_constant ) '::' identifier
+//	 ( qualified_identifier | type_constant ) T_COLON_COLON identifier
 
 private collection_type ::=
 	 T_ARRAY
@@ -502,49 +540,49 @@ list_expression ::=
 
 binary_expression ::=
 	 expression ('|>'
-	 | '??'
-	 | '||'
-	 | '&&'
-	 | '|'
-	 | '^'
-	 | '&'
-	 | '=='
-	 | '!='
-	 | '==='
-	 | '!=='
+	 | T_QQ
+	 | T_OR
+	 | T_AND
+	 | T_BIT_OR
+	 | T_BIT_NOT
+	 | T_BIT_AND
+	 | T_EQ_EQ
+	 | T_NEQ
+	 | T_EQ_STRICT
+	 | T_NEQ_STRICT
 	 | T_LT
 	 | T_GT
-	 | '<='
-	 | '>='
-	 | '<=>'
+	 | T_LT_EQ
+	 | T_GT_EQ
+	 | T_SPASESHIP
 	 | T_LT_LT
 	 | T_GT_GT
 	 | T_PLUS
 	 | T_MINUS
 	 | T_DOT
-	 | '*'
-	 | '/'
-	 | '%'
-	 | '**'
-	 | '?:'
+	 | T_MUL
+	 | T_DIV
+	 | T_PERCENT
+	 | T_POW
+	 | T_OR_VALUE
 	 | T_EQ
-	 | '??='
-	 | '.='
-	 | '|='
-	 | '^='
-	 | '&='
-	 | '<<='
-	 | '>>='
-	 | '+='
-	 | '-='
-	 | '*='
-	 | '/='
-	 | '%='
-	 | '**=') expression
+	 | T_OR_VALUE_ASSIGN
+	 | T_APPEND_ASSIGN
+	 | T_BIT_OR_ASSIGN
+	 | T_BIT_NOT_ASSIGN
+	 | T_BIT_AND_ASSIGN
+	 | T_BIT_MUL_ASSIGN
+	 | T_BIT_DIV_ASSIGN
+	 | T_PLUS_ASSIGN
+	 | T_MINUS_ASSIGN
+	 | T_MUL_ASSIGN
+	 | T_DIV_ASSIGN
+	 | T_PERCENT_ASSIGN
+	 | T_POW_ASSIGN) expression
 
 prefix_unary_expression ::=
 	 T_EM expression
-	| '~' expression
+	| T_TILDA expression
 	| T_MINUS expression
 	| T_PLUS expression
 	| T_PLUS_PLUS expression
@@ -552,7 +590,7 @@ prefix_unary_expression ::=
 	| T_PRINT expression
 	| T_CLONE expression
 	| T_AWAIT expression
-	| '@' expression
+	| T_AT expression
 
 postfix_unary_expression ::=
 	 expression ( T_PLUS_PLUS | T_MINUS_MINUS )
@@ -576,7 +614,7 @@ ternary_expression ::=
 	 expression T_QM expression T_COLON expression
 
 lambda_expression ::=
-	 attribute_modifier? async_modifier? ( single_parameter_parameters | parameters capability_list? ( T_COLON type )? ) '==>' ( expression | compound_statement )
+	 attribute_modifier? async_modifier? ( single_parameter_parameters | parameters capability_list? ( T_COLON type )? ) T_LAMBDA ( expression | compound_statement )
 
 private single_parameter_parameters ::=
 	 single_parameter
@@ -607,42 +645,9 @@ argument ::=
 	 ( inout_modifier | variadic_modifier )? expression
 
 //selection_expression ::=
-//	 ( variablish_expression | as_expression ) ( '?->' | '->' ) ( variablish_expression | braced_expression | keyword )
+//	 ( variablish_expression | as_expression ) ( '?->' | T_CHAIN ) ( variablish_expression | braced_expression | keyword )
 
-selection_expression ::= expression ('?->' | '->') (variablish_expression | braced_expression | keyword)
-
-//selection_expression ::=
-//    left_selection_expression ( '?->' | '->' ) right_selection_expression
-
-//	 ( variablish_expression | as_expression ) ( '?->' | '->' ) ( variablish_expression | braced_expression | keyword )
-
-
-//selection_expression ::=
-//	 n1_selection_expression
-//	 |	n2_selection_expression
-//	 |	n3_selection_expression
-//	 |	n4_selection_expression
-//	 |	n5_selection_expression
-//	 |	n6_selection_expression
-//
-//n1_selection_expression ::= variablish_expression ('?->' | '->') variablish_expression
-//n2_selection_expression ::= variablish_expression ('?->' | '->') braced_expression
-//n3_selection_expression ::= variablish_expression ('?->' | '->') keyword
-//
-//n4_selection_expression ::= as_expression ('?->' | '->') variablish_expression
-//n5_selection_expression ::= as_expression ('?->' | '->') braced_expression
-//n6_selection_expression ::= as_expression ('?->' | '->') keyword
-
-
-//selection_expression ::=
-//	 left_selection_expression ('?->' | '->') right_selection_expression
-//
-//private group_selection_expression ::=
-//	 left_selection_expression ('?->' | '->') right_selection_expression
-//
-//private left_selection_expression ::= variablish_expression | as_expression
-//private right_selection_expression ::= variablish_expression | braced_expression | keyword
-
+selection_expression ::= expression (T_CHAIN_OPTIONAL | T_CHAIN) (variablish_expression | braced_expression | keyword)
 
 alias_declaration ::=
 	 attribute_modifier? ( T_TYPE | T_NEWTYPE ) identifier type_parameters? ( T_AS type )? T_EQ type T_SEMICOLON
@@ -685,7 +690,7 @@ trait_use_clause ::=
 	 T_USE type ( T_COMMA type )* ( T_LBRACE ( ( trait_select_clause | trait_alias_clause ) T_SEMICOLON )* T_RBRACE | T_SEMICOLON )
 
 trait_select_clause ::=
-	 qualified_identifier_expression '::' identifier T_INSTEADOF qualified_identifier_expression ( T_COMMA qualified_identifier_expression )*
+	 qualified_identifier_expression T_COLON_COLON identifier T_INSTEADOF qualified_identifier_expression ( T_COMMA qualified_identifier_expression )*
 
 trait_alias_clause ::=
 	 identifier T_AS ( visibility_modifier identifier? | visibility_modifier? identifier )
@@ -739,7 +744,7 @@ enum_class_declaration ::=
 	 attribute_modifier? T_ENUM T_CLASS identifier T_COLON type extends_clause? T_LBRACE typed_enumerator* T_RBRACE
 
 enum_class_label_expression ::=
-	 qualified_identifier_expression? '#' identifier
+	 qualified_identifier_expression? T_SHARP identifier
 
 enumerator ::=
 	 identifier T_EQ expression T_SEMICOLON
@@ -811,7 +816,7 @@ await_modifier ::=
 //	| xhp_open ( xhp_string | xhp_comment | braced_expression | xhp_expression )* xhp_close
 //
 //xhp_comment ::=
-//	 ( '<!--' (T_MINUS?T_GT)?([^>]|[^-]T_GT|[^-]'->')* '-->' )
+//	 ( '<!--' (T_MINUS?T_GT)?([^>]|[^-]T_GT|[^-]T_CHAIN)* '-->' )
 //
 //xhp_string ::=
 //	 [^<{]+

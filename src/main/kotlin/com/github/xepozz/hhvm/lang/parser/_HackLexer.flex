@@ -49,6 +49,7 @@ STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
   "{"                                { return T_LBRACE; }
   "}"                                { return T_RBRACE; }
   ":"                                { return T_COLON; }
+  "::"                               { return T_COLON_COLON; }
   ";"                                { return T_SEMICOLON; }
   ","                                { return T_COMMA; }
   "."                                { return T_DOT; }
@@ -58,6 +59,7 @@ STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
   "["                                { return T_LBRACKET; }
   "]"                                { return T_RBRACKET; }
   "\\"                               { return T_BACKSLASH; }
+  "==>"                              { return T_LAMBDA; }
   "=>"                               { return T_GT_ET; }
   "+"                                { return T_PLUS; }
   "++"                               { return T_PLUS_PLUS; }
@@ -67,6 +69,42 @@ STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
   "!"                                { return T_EM; }
   "$"                                { return T_DOLLAR; }
   "$$"                               { return T_DOLLAR_DOLLAR; }
+  "??"                               { return T_QQ; }
+  "||"                               { return T_OR; }
+  "&&"                               { return T_AND; }
+  "|"                                { return T_BIT_OR; }
+  "^"                                { return T_BIT_NOT; }
+  "&"                                { return T_BIT_AND; }
+  "=="                               { return T_EQ_EQ; }
+  "!="                               { return T_NEQ; }
+  "==="                              { return T_EQ_STRICT; }
+  "!=="                              { return T_NEQ_STRICT; }
+  "<="                               { return T_LT_EQ; }
+  ">="                               { return T_GT_EQ; }
+  "<=>"                              { return T_SPASESHIP; }
+  "*"                                { return T_MUL; }
+  "/"                                { return T_DIV; }
+  "%"                                { return T_PERCENT; }
+  "**"                               { return T_POW; }
+  "?:"                               { return T_OR_VALUE; }
+  "??="                              { return T_OR_VALUE_ASSIGN; }
+  ".="                               { return T_APPEND_ASSIGN; }
+  "|="                               { return T_BIT_OR_ASSIGN; }
+  "^="                               { return T_BIT_NOT_ASSIGN; }
+  "&="                               { return T_BIT_AND_ASSIGN; }
+  "<<="                              { return T_BIT_MUL_ASSIGN; }
+  ">>="                              { return T_BIT_DIV_ASSIGN; }
+  "+="                               { return T_PLUS_ASSIGN; }
+  "-="                               { return T_MINUS_ASSIGN; }
+  "*="                               { return T_MUL_ASSIGN; }
+  "/="                               { return T_DIV_ASSIGN; }
+  "%="                               { return T_PERCENT_ASSIGN; }
+  "**="                              { return T_POW_ASSIGN; }
+  "@"                                { return T_AT; }
+  "~"                                { return T_TILDA; }
+  "?->"                              { return T_CHAIN_OPTIONAL; }
+  "->"                               { return T_CHAIN; }
+  "#"                                { return T_SHARP; }
   "throw"                            { return T_THROW; }
   "return"                           { return T_RETURN; }
   "break"                            { return T_BREAK; }
