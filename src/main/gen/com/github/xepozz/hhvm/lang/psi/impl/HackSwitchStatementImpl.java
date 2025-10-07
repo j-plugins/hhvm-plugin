@@ -1,0 +1,48 @@
+// This is a generated file. Not intended for manual editing.
+package com.github.xepozz.hhvm.lang.psi.impl;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static com.github.xepozz.hhvm.lang.psi.HackTypes.*;
+import com.github.xepozz.hhvm.lang.psi.*;
+
+public class HackSwitchStatementImpl extends HackStatementImpl implements HackSwitchStatement {
+
+  public HackSwitchStatementImpl(@NotNull ASTNode node) {
+    super(node);
+  }
+
+  @Override
+  public void accept(@NotNull HackVisitor visitor) {
+    visitor.visitSwitchStatement(this);
+  }
+
+  @Override
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof HackVisitor) accept((HackVisitor)visitor);
+    else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public HackParenthesizedExpression getParenthesizedExpression() {
+    return findNotNullChildByClass(HackParenthesizedExpression.class);
+  }
+
+  @Override
+  @NotNull
+  public List<HackSwitchCase> getSwitchCaseList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackSwitchCase.class);
+  }
+
+  @Override
+  @NotNull
+  public List<HackSwitchDefault> getSwitchDefaultList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackSwitchDefault.class);
+  }
+
+}

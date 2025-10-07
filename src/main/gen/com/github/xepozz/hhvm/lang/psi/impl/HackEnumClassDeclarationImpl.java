@@ -1,0 +1,84 @@
+// This is a generated file. Not intended for manual editing.
+package com.github.xepozz.hhvm.lang.psi.impl;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementVisitor;
+import com.intellij.psi.util.PsiTreeUtil;
+import static com.github.xepozz.hhvm.lang.psi.HackTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.github.xepozz.hhvm.lang.psi.*;
+
+public class HackEnumClassDeclarationImpl extends ASTWrapperPsiElement implements HackEnumClassDeclaration {
+
+  public HackEnumClassDeclarationImpl(@NotNull ASTNode node) {
+    super(node);
+  }
+
+  public void accept(@NotNull HackVisitor visitor) {
+    visitor.visitEnumClassDeclaration(this);
+  }
+
+  @Override
+  public void accept(@NotNull PsiElementVisitor visitor) {
+    if (visitor instanceof HackVisitor) accept((HackVisitor)visitor);
+    else super.accept(visitor);
+  }
+
+  @Override
+  @Nullable
+  public HackAttributeModifier getAttributeModifier() {
+    return findChildByClass(HackAttributeModifier.class);
+  }
+
+  @Override
+  @Nullable
+  public HackExtendsClause getExtendsClause() {
+    return findChildByClass(HackExtendsClause.class);
+  }
+
+  @Override
+  @Nullable
+  public HackFunctionTypeSpecifier getFunctionTypeSpecifier() {
+    return findChildByClass(HackFunctionTypeSpecifier.class);
+  }
+
+  @Override
+  @Nullable
+  public HackShapeTypeSpecifier getShapeTypeSpecifier() {
+    return findChildByClass(HackShapeTypeSpecifier.class);
+  }
+
+  @Override
+  @Nullable
+  public HackTupleTypeSpecifier getTupleTypeSpecifier() {
+    return findChildByClass(HackTupleTypeSpecifier.class);
+  }
+
+  @Override
+  @Nullable
+  public HackTypeConstant getTypeConstant() {
+    return findChildByClass(HackTypeConstant.class);
+  }
+
+  @Override
+  @Nullable
+  public HackTypeSpecifier getTypeSpecifier() {
+    return findChildByClass(HackTypeSpecifier.class);
+  }
+
+  @Override
+  @NotNull
+  public List<HackTypedEnumerator> getTypedEnumeratorList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackTypedEnumerator.class);
+  }
+
+  @Override
+  @NotNull
+  public PsiElement getIdentifier() {
+    return findNotNullChildByType(IDENTIFIER);
+  }
+
+}

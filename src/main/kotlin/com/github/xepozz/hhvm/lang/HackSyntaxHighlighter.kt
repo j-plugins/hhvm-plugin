@@ -17,8 +17,9 @@ class HackSyntaxHighlighter : SyntaxHighlighterBase() {
         when (tokenType) {
             HackTypes.VARIABLE_EXPRESSION,
             HackTypes.T_DOLLAR_DOLLAR,
-            HackTypes.T_DOLLAR -> DefaultLanguageHighlighterColors.LOCAL_VARIABLE
-            HackTypes.COMMENT -> DefaultLanguageHighlighterColors.LINE_COMMENT
+            HackTypes.T_DOLLAR -> DefaultLanguageHighlighterColors.GLOBAL_VARIABLE
+            HackTypes.INLINE_COMMENT -> DefaultLanguageHighlighterColors.LINE_COMMENT
+            HackTypes.BLOCK_COMMENT -> DefaultLanguageHighlighterColors.BLOCK_COMMENT
             HackTypes.IDENTIFIER -> DefaultLanguageHighlighterColors.IDENTIFIER
             HackTypes.STRING -> DefaultLanguageHighlighterColors.STRING
             HackTypes.FLOAT,

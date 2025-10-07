@@ -2,7 +2,7 @@
   parserClass="com.github.xepozz.hhvm.lang.parser.HackParser"
 
 //    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
-//    extends(".*statement")=statement
+    extends(".*statement")=statement
 //    extends(".*selection_expression")=selection_expression
     extends(".*expression")=expression
 
@@ -21,7 +21,9 @@
     OPEN_TAG="regexp:'<?'[hH][hH]?"
     identifier="regexp:[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*"
     EXPRESSION_TREE_IDENTIFIER="regexp:`[^`]*`"
-    comment="regexp:( // .* | '/*' [^*]*'*'+([^/*][^*]*'*'+)* / )"
+    inline_comment="regexp:( // [^\r\n]* )"
+//    block_comment="regexp:( /\* [^*]*'*'+([^/*][^*]*'*'+)* / )"
+    block_comment="regexp:( /\* ([^*] | \*+[^*/])* \*+/ )"
     float="regexp:( [0-9]+\.[0-9]*([eE][+-]?[0-9]+)? | [0-9]*\.[0-9]+([eE][+-]?[0-9]+)? | [0-9]+[eE][+-]?[0-9]+ )"
     integer="regexp:( [1-9][0-9]* | '0'[0-7]* | '0'[xX][0-9a-fA-F]+ | '0'[bB][01]+ )"
     true="regexp:('true' | 'True'| 'TRUE')"
@@ -207,7 +209,8 @@ private variablish_expression ::=
 	| subscript_expression
 	| qualified_identifier_expression
 	| parenthesized_expression
-//	| call_expression
+	| collection_call_expression
+	| expression_call_expression
 	| scoped_identifier_expression
 	| scope_identifier_expression
 	| selection_expression
@@ -281,7 +284,8 @@ expression ::=
 	| cast_expression
 	| ternary_expression
 	| lambda_expression
-	| call_expression
+	| collection_call_expression
+	| expression_call_expression
 	| selection_expression
 	| new_expression
 	| include_expression
@@ -583,12 +587,11 @@ private single_parameter ::=
 //call_expression ::=
 //	 ( expression | collection_type ) type_arguments? arguments
 
-private call_expression ::=
-	 call_callable_expression
-	 | call_collection_expression
+expression_call_expression ::=
+    expression type_arguments? arguments
 
-call_callable_expression ::= expression type_arguments? arguments
-call_collection_expression ::= collection_type type_arguments? arguments
+collection_call_expression ::=
+    collection_type type_arguments? arguments
 
 //call_expression ::=
 //	 (collection_type type_arguments? arguments)

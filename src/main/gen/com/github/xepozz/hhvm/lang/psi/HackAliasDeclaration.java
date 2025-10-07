@@ -1,0 +1,34 @@
+// This is a generated file. Not intended for manual editing.
+package com.github.xepozz.hhvm.lang.psi;
+
+import java.util.List;
+import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
+
+public interface HackAliasDeclaration extends PsiElement {
+
+  @Nullable
+  HackAttributeModifier getAttributeModifier();
+
+  @NotNull
+  List<HackFunctionTypeSpecifier> getFunctionTypeSpecifierList();
+
+  @NotNull
+  List<HackShapeTypeSpecifier> getShapeTypeSpecifierList();
+
+  @NotNull
+  List<HackTupleTypeSpecifier> getTupleTypeSpecifierList();
+
+  @NotNull
+  List<HackTypeConstant> getTypeConstantList();
+
+  @Nullable
+  HackTypeParameters getTypeParameters();
+
+  @NotNull
+  List<HackTypeSpecifier> getTypeSpecifierList();
+
+  @NotNull
+  PsiElement getIdentifier();
+
+}
