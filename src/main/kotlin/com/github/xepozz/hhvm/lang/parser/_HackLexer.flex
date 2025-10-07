@@ -36,6 +36,8 @@ TRUE=('true' | 'True'| 'TRUE')
 FALSE=('false' | 'False'| 'FALSE')
 NULL=('null' | 'Null'| 'NULL')
 STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
+XHP_IDENTIFIER_VALUE=( [a-zA-Z_][a-zA-Z0-9_]*([-:][a-zA-Z0-9_]+)* )
+XHP_COMMENT=( <!-- (-?>)?([^>]|[^-]>|[^-]->)* --> )
 
 %%
 <YYINITIAL> {
@@ -46,6 +48,7 @@ STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
   ">"                                { return T_GT; }
   "<<"                               { return T_LT_LT; }
   ">>"                               { return T_GT_GT; }
+  "|>"                               { return T_OR_GT; }
   "{"                                { return T_LBRACE; }
   "}"                                { return T_RBRACE; }
   ":"                                { return T_COLON; }
@@ -105,6 +108,8 @@ STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
   "?->"                              { return T_CHAIN_OPTIONAL; }
   "->"                               { return T_CHAIN; }
   "#"                                { return T_SHARP; }
+  "/>"                               { return T_SLASH_GT; }
+  "</"                               { return T_LT_SLASH; }
   "throw"                            { return T_THROW; }
   "return"                           { return T_RETURN; }
   "break"                            { return T_BREAK; }
@@ -189,7 +194,12 @@ STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
   "extends"                          { return T_EXTENDS; }
   "implements"                       { return T_IMPLEMENTS; }
   "ctx"                              { return T_CTX; }
-  "T_LIST"                           { return T_LIST; }
+  "list"                             { return T_LIST; }
+  "children"                         { return T_CHILDREN; }
+  "category"                         { return T_CATEGORY; }
+  "@required"                        { return T_AT_REQUIRED; }
+  "@lateinit"                        { return T_AT_LATEINIT; }
+  "attribute"                        { return T_ATTRIBUTE; }
 
   {OPEN_TAG}                         { return OPEN_TAG; }
   {IDENTIFIER}                       { return IDENTIFIER; }
@@ -202,6 +212,8 @@ STRING=(\"([^\\\"]|\\.)*\"|'([^\']|\\.)*')
   {FALSE}                            { return FALSE; }
   {NULL}                             { return NULL; }
   {STRING}                           { return STRING; }
+  {XHP_IDENTIFIER_VALUE}             { return XHP_IDENTIFIER_VALUE; }
+  {XHP_COMMENT}                      { return XHP_COMMENT; }
 
 }
 

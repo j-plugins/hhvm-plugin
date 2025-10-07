@@ -10,15 +10,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.xepozz.hhvm.lang.psi.HackTypes.*;
 import com.github.xepozz.hhvm.lang.psi.*;
 
-public class HackListExpressionImpl extends HackExpressionImpl implements HackListExpression {
+public class HackXhpParenthesizedExpressionImpl extends HackExpressionImpl implements HackXhpParenthesizedExpression {
 
-  public HackListExpressionImpl(@NotNull ASTNode node) {
+  public HackXhpParenthesizedExpressionImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   @Override
   public void accept(@NotNull HackVisitor visitor) {
-    visitor.visitListExpression(this);
+    visitor.visitXhpParenthesizedExpression(this);
   }
 
   @Override

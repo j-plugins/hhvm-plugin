@@ -36,6 +36,7 @@
     T_GT=">"
     T_LT_LT="<<"
     T_GT_GT=">>"
+    T_OR_GT="|>"
     T_LBRACE="{"
     T_RBRACE="}"
     T_COLON=":"
@@ -95,6 +96,8 @@
     T_CHAIN_OPTIONAL="?->"
     T_CHAIN="->"
     T_SHARP="#"
+    T_SLASH_GT="/>"
+    T_LT_SLASH="</"
 
     T_THROW="throw"
     T_RETURN="return"
@@ -194,19 +197,23 @@
     T_IMPLEMENTS="implements"
     T_CTX="ctx"
     T_FUNCTION="function"
-    T_LIST
-//    xhp_identifier_value="[a-zA-Z_][a-zA-Z0-9_]*([-:][a-zA-Z0-9_]+)*"
+    T_LIST="list"
+    T_CHILDREN="children"
+    T_CATEGORY="category"
+    T_AT_REQUIRED="@required"
+    T_AT_LATEINIT="@lateinit"
+    T_ATTRIBUTE="attribute"
+    XHP_IDENTIFIER_VALUE="regexp:( [a-zA-Z_][a-zA-Z0-9_]*([-:][a-zA-Z0-9_]+)* )"
+//    XHP_STRING="regexp:( [^<{]+ )"
+    XHP_COMMENT="regexp:( <!-- (-?>)?([^>]|[^-]>|[^-]->)* --> )"
   ]
 }
 
 hackFile ::=
 	 OPEN_TAG? statement*
 
-//identifier ::=
-//	 [a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*
-
 variable_expression ::=
-	 ( T_DOLLAR identifier )
+	 T_DOLLAR identifier
 
 pipe_variable_expression ::=
 	 T_DOLLAR_DOLLAR
@@ -232,8 +239,7 @@ qualified_identifier_expression ::=
 	| identifier
 
 scoped_identifier_expression ::=
-//	 ( qualified_identifier | variable | scope_identifier | xhp_identifier | pipe_variable ) T_COLON_COLON ( identifier | variable )
-	 ( qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression ) T_COLON_COLON ( identifier | variable_expression )
+	 ( qualified_identifier_expression | variable_expression | scope_identifier_expression | xhp_identifier_expression | pipe_variable_expression ) T_COLON_COLON ( identifier | variable_expression )
 
 scope_identifier_expression ::=
 	 T_SELF
@@ -252,7 +258,7 @@ private variablish_expression ::=
 	| scoped_identifier_expression
 	| scope_identifier_expression
 	| selection_expression
-//	| xhp_identifier
+	| xhp_identifier_expression
 
 statement ::=
 	 declaration
@@ -292,17 +298,17 @@ private declaration ::=
 module_attribute ::=
 	 T_LT_LT identifier T_COLON qualified_identifier_expression arguments? ( T_COMMA qualified_identifier_expression arguments? )* T_COMMA? T_GT_GT
 
-//heredoc ::=
+//heredoc_expression ::=
 //	 '<<<' heredoc_start heredoc_start_newline? ( heredoc_body | variable | embedded_braced_expression )* heredoc_end_newline? heredoc_end
 
 //embedded_braced_expression ::=
-//	 embedded_opening_brace ( variable | call_expression | subscript_expression | selection_expression ) T_RBRACE
+//	 T_LBRACE ( variable_expression | collection_call_expression | expression_call_expression | subscript_expression | selection_expression ) T_RBRACE
 
 braced_expression ::=
 	 T_LBRACE expression T_RBRACE
 
 expression ::=
-//	 heredoc
+//	heredoc_expression
 	array_expression
 	| tuple_expression
 	| shape_expression
@@ -329,7 +335,7 @@ expression ::=
 	| include_expression
 	| require_expression
 	| anonymous_function_expression
-//	| xhp_expression
+	| xhp_expression
 	| function_pointer_expression
 	| enum_class_label_expression
 //  {extraRoot=true}
@@ -438,8 +444,7 @@ private type ::=
 	| tuple_type_specifier
 
 type_specifier ::=
-	 type_modifier* ( primitive_type | qualified_identifier_expression | collection_type ) type_arguments?
-//	 type_modifier* ( primitive_type | qualified_identifier | collection_type | xhp_identifier ) type_arguments?
+	 type_modifier* ( primitive_type | qualified_identifier_expression | collection_type | xhp_identifier_expression ) type_arguments?
 
 private type_modifier ::=
 	 T_AT
@@ -539,7 +544,8 @@ list_expression ::=
 	 T_LIST T_LPAREN expression? ( T_COMMA expression? )* T_COMMA? T_RPAREN
 
 binary_expression ::=
-	 expression ('|>'
+	 expression (
+	 T_OR_GT
 	 | T_QQ
 	 | T_OR
 	 | T_AND
@@ -578,7 +584,8 @@ binary_expression ::=
 	 | T_MUL_ASSIGN
 	 | T_DIV_ASSIGN
 	 | T_PERCENT_ASSIGN
-	 | T_POW_ASSIGN) expression
+	 | T_POW_ASSIGN
+	 ) expression
 
 prefix_unary_expression ::=
 	 T_EM expression
@@ -645,7 +652,7 @@ argument ::=
 	 ( inout_modifier | variadic_modifier )? expression
 
 //selection_expression ::=
-//	 ( variablish_expression | as_expression ) ( '?->' | T_CHAIN ) ( variablish_expression | braced_expression | keyword )
+//	 ( variablish_expression | as_expression ) ( T_CHAIN_OPTIONAL | T_CHAIN ) ( variablish_expression | braced_expression | keyword )
 
 selection_expression ::= expression (T_CHAIN_OPTIONAL | T_CHAIN) (variablish_expression | braced_expression | keyword)
 
@@ -679,12 +686,10 @@ interface_declaration ::=
 	 attribute_modifier? T_INTERFACE identifier type_parameters? extends_clause? where_clause? member_declarations
 
 class_declaration ::=
-//	 attribute_modifier? class_modifier? class_modifier? xhp_modifier? T_CLASS ( identifier | xhp_identifier ) type_parameters? extends_clause? implements_clause? where_clause? member_declarations
-	 attribute_modifier? class_modifier? class_modifier? T_CLASS ( identifier ) type_parameters? extends_clause? implements_clause? where_clause? member_declarations
+	 attribute_modifier? class_modifier? class_modifier? xhp_modifier? T_CLASS ( identifier | xhp_identifier_expression ) type_parameters? extends_clause? implements_clause? where_clause? member_declarations
 
 member_declarations ::=
-	 T_LBRACE ( class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause )* T_RBRACE
-//	 T_LBRACE ( class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause | xhp_attribute_declaration | xhp_children_declaration | xhp_category_declaration )* T_RBRACE
+	 T_LBRACE ( class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause | xhp_attribute_declaration | xhp_children_declaration | xhp_category_declaration )* T_RBRACE
 
 trait_use_clause ::=
 	 T_USE type ( T_COMMA type )* ( T_LBRACE ( ( trait_select_clause | trait_alias_clause ) T_SEMICOLON )* T_RBRACE | T_SEMICOLON )
@@ -771,8 +776,8 @@ final_modifier ::=
 abstract_modifier ::=
 	 T_ABSTRACT
 
-//xhp_modifier ::=
-//	 T_XHP
+xhp_modifier ::=
+	 T_XHP
 
 static_modifier ::=
 	 T_STATIC
@@ -798,63 +803,6 @@ async_modifier ::=
 await_modifier ::=
 	 T_AWAIT
 
-//xhp_identifier ::=
-//	 xhp_identifier_value
-//
-//xhp_class_identifier ::=
-//	 T_COLONxhp_identifier_value
-//
-//private xhp_identifier ::=
-//	 xhp_identifier
-//	| xhp_class_identifier
-//
-//xhp_category_identifier ::=
-//	 '%'xhp_identifier_value
-//
-//xhp_expression ::=
-//	 xhp_open_close
-//	| xhp_open ( xhp_string | xhp_comment | braced_expression | xhp_expression )* xhp_close
-//
-//xhp_comment ::=
-//	 ( '<!--' (T_MINUS?T_GT)?([^>]|[^-]T_GT|[^-]T_CHAIN)* '-->' )
-//
-//xhp_string ::=
-//	 [^<{]+
-//
-//xhp_open ::=
-//	 T_LT xhp_identifier xhp_attribute* T_GT
-//
-//xhp_open_close ::=
-//	 T_LT xhp_identifier xhp_attribute* '/>'
-//
-//xhp_close ::=
-//	 '</' xhp_identifier T_GT
-//
-//xhp_attribute ::=
-//	 xhp_identifier T_EQ ( string | braced_expression )
-//	| braced_expression
-//	| xhp_spread_expression
-//
-//xhp_spread_expression ::=
-//	 T_LBRACE T_THREE_DOTS expression T_RBRACE
-//
-//xhp_attribute_declaration ::=
-//	 'attribute' xhp_class_attribute ( T_COMMA xhp_class_attribute )* T_SEMICOLON
-//
-//xhp_class_attribute ::=
-//	 ( type | xhp_enum_type ) xhp_identifier? ( T_EQ expression )? ( '@required' | '@lateinit' )?
-//
-//xhp_enum_type ::=
-//	 T_ENUM T_LBRACE ( string | integer ) ( T_COMMA ( string | integer ) )* T_COMMA? T_RBRACE
-//
-//private xhp_attribute_expression ::=
-//	 xhp_identifier
-//	| xhp_class_identifier
-//	| xhp_category_identifier
-//	| xhp_binary_expression
-//	| xhp_postfix_unary_expression
-//	| xhp_parenthesized_expression
-
 function_pointer_expression ::=
 	 ( scoped_identifier_expression | qualified_identifier_expression ) type_arguments
 
@@ -864,18 +812,71 @@ anonymous_function_expression ::=
 private anonymous_function_use_clause ::=
 	 T_USE T_LPAREN variable_expression ( T_COMMA variable_expression )* T_COMMA? T_RPAREN
 
-//xhp_children_declaration ::=
-//	 'children' xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_SEMICOLON
-//
-//xhp_category_declaration ::=
-//	 'category' xhp_category_identifier ( T_COMMA xhp_category_identifier )* T_SEMICOLON
+xhp_identifier_expression ::=
+	 XHP_IDENTIFIER_VALUE
 
-//private xhp_binary_expression ::=
-//	 xhp_attribute_expression '|' xhp_attribute_expression
-//
-//private xhp_postfix_unary_expression ::=
-//	 xhp_attribute_expression ( T_PLUS | '*' | T_QM )
-//
-//private xhp_parenthesized_expression ::=
-//	 T_LPAREN xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_RPAREN
+xhp_class_identifier ::=
+	 T_COLON XHP_IDENTIFIER_VALUE
+
+//private xhp_identifier ::=
+//	 xhp_identifier
+//	| xhp_class_identifier
+
+xhp_category_identifier ::=
+	 T_PERCENT XHP_IDENTIFIER_VALUE
+
+xhp_expression ::=
+	 xhp_open_close
+	| xhp_open ( xhp_string | XHP_COMMENT | braced_expression | xhp_expression )* xhp_close
+
+xhp_string ::= ( "regexp:( [^<{]+ )" )
+
+xhp_open ::=
+	 T_LT xhp_identifier_expression xhp_attribute* T_GT
+
+xhp_open_close ::=
+	 T_LT xhp_identifier_expression xhp_attribute* T_SLASH_GT
+
+xhp_close ::=
+	 T_LT_SLASH xhp_identifier_expression T_GT
+
+xhp_attribute ::=
+	 xhp_identifier_expression T_EQ ( string | braced_expression )
+	| braced_expression
+	| xhp_spread_expression
+
+xhp_spread_expression ::=
+	 T_LBRACE T_THREE_DOTS expression T_RBRACE
+
+xhp_attribute_declaration ::=
+	 T_ATTRIBUTE xhp_class_attribute ( T_COMMA xhp_class_attribute )* T_SEMICOLON
+
+xhp_class_attribute ::=
+	 ( type | xhp_enum_type ) xhp_identifier_expression? ( T_EQ expression )? ( T_AT_REQUIRED | T_AT_LATEINIT )?
+
+xhp_enum_type ::=
+	 T_ENUM T_LBRACE ( string | integer ) ( T_COMMA ( string | integer ) )* T_COMMA? T_RBRACE
+
+xhp_attribute_expression ::=
+	 xhp_identifier_expression
+	| xhp_class_identifier
+	| xhp_category_identifier
+//	| xhp_binary_expression
+//	| xhp_postfix_unary_expression
+	| xhp_parenthesized_expression
+
+xhp_children_declaration ::=
+	 T_CHILDREN xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_SEMICOLON
+
+xhp_category_declaration ::=
+	 T_CATEGORY xhp_category_identifier ( T_COMMA xhp_category_identifier )* T_SEMICOLON
+
+xhp_binary_expression ::=
+	 xhp_attribute_expression T_BIT_OR xhp_attribute_expression
+
+xhp_postfix_unary_expression ::=
+	 xhp_attribute_expression ( T_PLUS | T_MUL | T_QM )
+
+xhp_parenthesized_expression ::=
+	 T_LPAREN xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_RPAREN
 

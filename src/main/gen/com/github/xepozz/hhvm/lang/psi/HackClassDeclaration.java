@@ -31,7 +31,13 @@ public interface HackClassDeclaration extends PsiElement {
   @Nullable
   HackWhereClause getWhereClause();
 
-  @NotNull
+  @Nullable
+  HackXhpIdentifierExpression getXhpIdentifierExpression();
+
+  @Nullable
+  HackXhpModifier getXhpModifier();
+
+  @Nullable
   PsiElement getIdentifier();
 
 }

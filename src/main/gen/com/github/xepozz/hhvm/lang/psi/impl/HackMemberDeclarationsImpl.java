@@ -129,4 +129,22 @@ public class HackMemberDeclarationsImpl extends ASTWrapperPsiElement implements 
     return PsiTreeUtil.getChildrenOfTypeAsList(this, HackVisibilityModifier.class);
   }
 
+  @Override
+  @NotNull
+  public List<HackXhpAttributeDeclaration> getXhpAttributeDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackXhpAttributeDeclaration.class);
+  }
+
+  @Override
+  @NotNull
+  public List<HackXhpCategoryDeclaration> getXhpCategoryDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackXhpCategoryDeclaration.class);
+  }
+
+  @Override
+  @NotNull
+  public List<HackXhpChildrenDeclaration> getXhpChildrenDeclarationList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackXhpChildrenDeclaration.class);
+  }
+
 }

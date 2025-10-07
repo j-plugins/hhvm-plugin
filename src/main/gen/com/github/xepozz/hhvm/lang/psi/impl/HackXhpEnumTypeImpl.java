@@ -8,29 +8,23 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.xepozz.hhvm.lang.psi.HackTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.github.xepozz.hhvm.lang.psi.*;
 
-public class HackListExpressionImpl extends HackExpressionImpl implements HackListExpression {
+public class HackXhpEnumTypeImpl extends ASTWrapperPsiElement implements HackXhpEnumType {
 
-  public HackListExpressionImpl(@NotNull ASTNode node) {
+  public HackXhpEnumTypeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  @Override
   public void accept(@NotNull HackVisitor visitor) {
-    visitor.visitListExpression(this);
+    visitor.visitXhpEnumType(this);
   }
 
   @Override
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof HackVisitor) accept((HackVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public List<HackExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackExpression.class);
   }
 
 }

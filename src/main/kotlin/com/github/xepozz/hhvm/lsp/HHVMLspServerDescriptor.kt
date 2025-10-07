@@ -33,7 +33,7 @@ import org.eclipse.lsp4j.Diagnostic
 import org.eclipse.lsp4j.InitializeResult
 import java.nio.file.Path
 
-class HHVMLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "HHVM Language") {
+class HHVMLspServerDescriptor(project: Project) : ProjectWideLspServerDescriptor(project, "Hack Language") {
     override fun startServerProcess(): OSProcessHandler {
         val startServerProcess = super.startServerProcess()
         startServerProcess.addProcessListener(object : ProcessListener {

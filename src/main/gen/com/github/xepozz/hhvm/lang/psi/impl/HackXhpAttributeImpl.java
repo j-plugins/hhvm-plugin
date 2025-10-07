@@ -8,17 +8,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.xepozz.hhvm.lang.psi.HackTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.github.xepozz.hhvm.lang.psi.*;
 
-public class HackListExpressionImpl extends HackExpressionImpl implements HackListExpression {
+public class HackXhpAttributeImpl extends ASTWrapperPsiElement implements HackXhpAttribute {
 
-  public HackListExpressionImpl(@NotNull ASTNode node) {
+  public HackXhpAttributeImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  @Override
   public void accept(@NotNull HackVisitor visitor) {
-    visitor.visitListExpression(this);
+    visitor.visitXhpAttribute(this);
   }
 
   @Override
@@ -31,6 +31,12 @@ public class HackListExpressionImpl extends HackExpressionImpl implements HackLi
   @NotNull
   public List<HackExpression> getExpressionList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, HackExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getString() {
+    return findChildByType(STRING);
   }
 
 }

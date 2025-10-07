@@ -471,6 +471,86 @@ public class HackVisitor extends PsiElementVisitor {
     visitStatement(o);
   }
 
+  public void visitXhpAttribute(@NotNull HackXhpAttribute o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpAttributeDeclaration(@NotNull HackXhpAttributeDeclaration o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpAttributeExpression(@NotNull HackXhpAttributeExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitXhpBinaryExpression(@NotNull HackXhpBinaryExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitXhpCategoryDeclaration(@NotNull HackXhpCategoryDeclaration o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpCategoryIdentifier(@NotNull HackXhpCategoryIdentifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpChildrenDeclaration(@NotNull HackXhpChildrenDeclaration o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpClassAttribute(@NotNull HackXhpClassAttribute o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpClassIdentifier(@NotNull HackXhpClassIdentifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpClose(@NotNull HackXhpClose o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpEnumType(@NotNull HackXhpEnumType o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpExpression(@NotNull HackXhpExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitXhpIdentifierExpression(@NotNull HackXhpIdentifierExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitXhpModifier(@NotNull HackXhpModifier o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpOpen(@NotNull HackXhpOpen o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpOpenClose(@NotNull HackXhpOpenClose o) {
+    visitPsiElement(o);
+  }
+
+  public void visitXhpParenthesizedExpression(@NotNull HackXhpParenthesizedExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitXhpPostfixUnaryExpression(@NotNull HackXhpPostfixUnaryExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitXhpSpreadExpression(@NotNull HackXhpSpreadExpression o) {
+    visitExpression(o);
+  }
+
+  public void visitXhpString(@NotNull HackXhpString o) {
+    visitPsiElement(o);
+  }
+
   public void visitYieldExpression(@NotNull HackYieldExpression o) {
     visitExpression(o);
   }

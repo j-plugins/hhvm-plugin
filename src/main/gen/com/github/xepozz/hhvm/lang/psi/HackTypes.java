@@ -124,6 +124,26 @@ public interface HackTypes {
   IElementType WHERE_CLAUSE = new HackElementType("WHERE_CLAUSE");
   IElementType WHERE_CONSTRAINT = new HackElementType("WHERE_CONSTRAINT");
   IElementType WHILE_STATEMENT = new HackElementType("WHILE_STATEMENT");
+  IElementType XHP_ATTRIBUTE = new HackElementType("XHP_ATTRIBUTE");
+  IElementType XHP_ATTRIBUTE_DECLARATION = new HackElementType("XHP_ATTRIBUTE_DECLARATION");
+  IElementType XHP_ATTRIBUTE_EXPRESSION = new HackElementType("XHP_ATTRIBUTE_EXPRESSION");
+  IElementType XHP_BINARY_EXPRESSION = new HackElementType("XHP_BINARY_EXPRESSION");
+  IElementType XHP_CATEGORY_DECLARATION = new HackElementType("XHP_CATEGORY_DECLARATION");
+  IElementType XHP_CATEGORY_IDENTIFIER = new HackElementType("XHP_CATEGORY_IDENTIFIER");
+  IElementType XHP_CHILDREN_DECLARATION = new HackElementType("XHP_CHILDREN_DECLARATION");
+  IElementType XHP_CLASS_ATTRIBUTE = new HackElementType("XHP_CLASS_ATTRIBUTE");
+  IElementType XHP_CLASS_IDENTIFIER = new HackElementType("XHP_CLASS_IDENTIFIER");
+  IElementType XHP_CLOSE = new HackElementType("XHP_CLOSE");
+  IElementType XHP_ENUM_TYPE = new HackElementType("XHP_ENUM_TYPE");
+  IElementType XHP_EXPRESSION = new HackElementType("XHP_EXPRESSION");
+  IElementType XHP_IDENTIFIER_EXPRESSION = new HackElementType("XHP_IDENTIFIER_EXPRESSION");
+  IElementType XHP_MODIFIER = new HackElementType("XHP_MODIFIER");
+  IElementType XHP_OPEN = new HackElementType("XHP_OPEN");
+  IElementType XHP_OPEN_CLOSE = new HackElementType("XHP_OPEN_CLOSE");
+  IElementType XHP_PARENTHESIZED_EXPRESSION = new HackElementType("XHP_PARENTHESIZED_EXPRESSION");
+  IElementType XHP_POSTFIX_UNARY_EXPRESSION = new HackElementType("XHP_POSTFIX_UNARY_EXPRESSION");
+  IElementType XHP_SPREAD_EXPRESSION = new HackElementType("XHP_SPREAD_EXPRESSION");
+  IElementType XHP_STRING = new HackElementType("XHP_STRING");
   IElementType YIELD_EXPRESSION = new HackElementType("YIELD_EXPRESSION");
 
   IElementType BLOCK_COMMENT = new HackTokenType("block_comment");
@@ -146,6 +166,9 @@ public interface HackTypes {
   IElementType T_ASYNC = new HackTokenType("async");
   IElementType T_AS_OPTIONAL = new HackTokenType("?as");
   IElementType T_AT = new HackTokenType("@");
+  IElementType T_ATTRIBUTE = new HackTokenType("attribute");
+  IElementType T_AT_LATEINIT = new HackTokenType("@lateinit");
+  IElementType T_AT_REQUIRED = new HackTokenType("@required");
   IElementType T_AWAIT = new HackTokenType("await");
   IElementType T_BACKSLASH = new HackTokenType("\\");
   IElementType T_BIT_AND = new HackTokenType("&");
@@ -160,8 +183,10 @@ public interface HackTypes {
   IElementType T_BREAK = new HackTokenType("break");
   IElementType T_CASE = new HackTokenType("case");
   IElementType T_CATCH = new HackTokenType("catch");
+  IElementType T_CATEGORY = new HackTokenType("category");
   IElementType T_CHAIN = new HackTokenType("->");
   IElementType T_CHAIN_OPTIONAL = new HackTokenType("?->");
+  IElementType T_CHILDREN = new HackTokenType("children");
   IElementType T_CLASS = new HackTokenType("class");
   IElementType T_CLONE = new HackTokenType("clone");
   IElementType T_COLON = new HackTokenType(":");
@@ -214,11 +239,12 @@ public interface HackTypes {
   IElementType T_LAMBDA = new HackTokenType("==>");
   IElementType T_LBRACE = new HackTokenType("{");
   IElementType T_LBRACKET = new HackTokenType("[");
-  IElementType T_LIST = new HackTokenType("T_LIST");
+  IElementType T_LIST = new HackTokenType("list");
   IElementType T_LPAREN = new HackTokenType("(");
   IElementType T_LT = new HackTokenType("<");
   IElementType T_LT_EQ = new HackTokenType("<=");
   IElementType T_LT_LT = new HackTokenType("<<");
+  IElementType T_LT_SLASH = new HackTokenType("</");
   IElementType T_MINUS = new HackTokenType("-");
   IElementType T_MINUS_ASSIGN = new HackTokenType("-=");
   IElementType T_MINUS_MINUS = new HackTokenType("--");
@@ -236,6 +262,7 @@ public interface HackTypes {
   IElementType T_NULL = new HackTokenType("null");
   IElementType T_NUM = new HackTokenType("num");
   IElementType T_OR = new HackTokenType("||");
+  IElementType T_OR_GT = new HackTokenType("|>");
   IElementType T_OR_VALUE = new HackTokenType("?:");
   IElementType T_OR_VALUE_ASSIGN = new HackTokenType("??=");
   IElementType T_PARENT = new HackTokenType("parent");
@@ -264,6 +291,7 @@ public interface HackTypes {
   IElementType T_SEMICOLON = new HackTokenType(";");
   IElementType T_SHAPE = new HackTokenType("shape");
   IElementType T_SHARP = new HackTokenType("#");
+  IElementType T_SLASH_GT = new HackTokenType("/>");
   IElementType T_SPASESHIP = new HackTokenType("<=>");
   IElementType T_STATIC = new HackTokenType("static");
   IElementType T_STRING = new HackTokenType("string");
@@ -286,6 +314,8 @@ public interface HackTypes {
   IElementType T_WHILE = new HackTokenType("while");
   IElementType T_XHP = new HackTokenType("xhp");
   IElementType T_YIELD = new HackTokenType("yield");
+  IElementType XHP_COMMENT = new HackTokenType("XHP_COMMENT");
+  IElementType XHP_IDENTIFIER_VALUE = new HackTokenType("XHP_IDENTIFIER_VALUE");
 
   class Factory {
     public static PsiElement createElement(ASTNode node) {
@@ -634,6 +664,66 @@ public interface HackTypes {
       }
       else if (type == WHILE_STATEMENT) {
         return new HackWhileStatementImpl(node);
+      }
+      else if (type == XHP_ATTRIBUTE) {
+        return new HackXhpAttributeImpl(node);
+      }
+      else if (type == XHP_ATTRIBUTE_DECLARATION) {
+        return new HackXhpAttributeDeclarationImpl(node);
+      }
+      else if (type == XHP_ATTRIBUTE_EXPRESSION) {
+        return new HackXhpAttributeExpressionImpl(node);
+      }
+      else if (type == XHP_BINARY_EXPRESSION) {
+        return new HackXhpBinaryExpressionImpl(node);
+      }
+      else if (type == XHP_CATEGORY_DECLARATION) {
+        return new HackXhpCategoryDeclarationImpl(node);
+      }
+      else if (type == XHP_CATEGORY_IDENTIFIER) {
+        return new HackXhpCategoryIdentifierImpl(node);
+      }
+      else if (type == XHP_CHILDREN_DECLARATION) {
+        return new HackXhpChildrenDeclarationImpl(node);
+      }
+      else if (type == XHP_CLASS_ATTRIBUTE) {
+        return new HackXhpClassAttributeImpl(node);
+      }
+      else if (type == XHP_CLASS_IDENTIFIER) {
+        return new HackXhpClassIdentifierImpl(node);
+      }
+      else if (type == XHP_CLOSE) {
+        return new HackXhpCloseImpl(node);
+      }
+      else if (type == XHP_ENUM_TYPE) {
+        return new HackXhpEnumTypeImpl(node);
+      }
+      else if (type == XHP_EXPRESSION) {
+        return new HackXhpExpressionImpl(node);
+      }
+      else if (type == XHP_IDENTIFIER_EXPRESSION) {
+        return new HackXhpIdentifierExpressionImpl(node);
+      }
+      else if (type == XHP_MODIFIER) {
+        return new HackXhpModifierImpl(node);
+      }
+      else if (type == XHP_OPEN) {
+        return new HackXhpOpenImpl(node);
+      }
+      else if (type == XHP_OPEN_CLOSE) {
+        return new HackXhpOpenCloseImpl(node);
+      }
+      else if (type == XHP_PARENTHESIZED_EXPRESSION) {
+        return new HackXhpParenthesizedExpressionImpl(node);
+      }
+      else if (type == XHP_POSTFIX_UNARY_EXPRESSION) {
+        return new HackXhpPostfixUnaryExpressionImpl(node);
+      }
+      else if (type == XHP_SPREAD_EXPRESSION) {
+        return new HackXhpSpreadExpressionImpl(node);
+      }
+      else if (type == XHP_STRING) {
+        return new HackXhpStringImpl(node);
       }
       else if (type == YIELD_EXPRESSION) {
         return new HackYieldExpressionImpl(node);

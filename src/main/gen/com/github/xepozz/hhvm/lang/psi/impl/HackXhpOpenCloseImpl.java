@@ -8,17 +8,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.xepozz.hhvm.lang.psi.HackTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.github.xepozz.hhvm.lang.psi.*;
 
-public class HackListExpressionImpl extends HackExpressionImpl implements HackListExpression {
+public class HackXhpOpenCloseImpl extends ASTWrapperPsiElement implements HackXhpOpenClose {
 
-  public HackListExpressionImpl(@NotNull ASTNode node) {
+  public HackXhpOpenCloseImpl(@NotNull ASTNode node) {
     super(node);
   }
 
-  @Override
   public void accept(@NotNull HackVisitor visitor) {
-    visitor.visitListExpression(this);
+    visitor.visitXhpOpenClose(this);
   }
 
   @Override
@@ -29,8 +29,14 @@ public class HackListExpressionImpl extends HackExpressionImpl implements HackLi
 
   @Override
   @NotNull
-  public List<HackExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackExpression.class);
+  public List<HackXhpAttribute> getXhpAttributeList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackXhpAttribute.class);
+  }
+
+  @Override
+  @NotNull
+  public HackXhpIdentifierExpression getXhpIdentifierExpression() {
+    return findNotNullChildByClass(HackXhpIdentifierExpression.class);
   }
 
 }

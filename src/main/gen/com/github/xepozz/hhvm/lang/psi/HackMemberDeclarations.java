@@ -58,4 +58,13 @@ public interface HackMemberDeclarations extends PsiElement {
   @NotNull
   List<HackVisibilityModifier> getVisibilityModifierList();
 
+  @NotNull
+  List<HackXhpAttributeDeclaration> getXhpAttributeDeclarationList();
+
+  @NotNull
+  List<HackXhpCategoryDeclaration> getXhpCategoryDeclarationList();
+
+  @NotNull
+  List<HackXhpChildrenDeclaration> getXhpChildrenDeclarationList();
+
 }

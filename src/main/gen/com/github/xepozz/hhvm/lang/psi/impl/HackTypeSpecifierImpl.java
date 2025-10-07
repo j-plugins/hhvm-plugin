@@ -29,8 +29,8 @@ public class HackTypeSpecifierImpl extends ASTWrapperPsiElement implements HackT
 
   @Override
   @Nullable
-  public HackQualifiedIdentifierExpression getQualifiedIdentifierExpression() {
-    return findChildByClass(HackQualifiedIdentifierExpression.class);
+  public HackExpression getExpression() {
+    return findChildByClass(HackExpression.class);
   }
 
   @Override

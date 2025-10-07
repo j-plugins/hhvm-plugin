@@ -5,9 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface HackListExpression extends HackExpression {
+public interface HackXhpAttributeExpression extends HackExpression {
 
-  @NotNull
-  List<HackExpression> getExpressionList();
+  @Nullable
+  HackXhpCategoryIdentifier getXhpCategoryIdentifier();
+
+  @Nullable
+  HackXhpClassIdentifier getXhpClassIdentifier();
 
 }

@@ -10,15 +10,15 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.xepozz.hhvm.lang.psi.HackTypes.*;
 import com.github.xepozz.hhvm.lang.psi.*;
 
-public class HackListExpressionImpl extends HackExpressionImpl implements HackListExpression {
+public class HackXhpAttributeExpressionImpl extends HackExpressionImpl implements HackXhpAttributeExpression {
 
-  public HackListExpressionImpl(@NotNull ASTNode node) {
+  public HackXhpAttributeExpressionImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   @Override
   public void accept(@NotNull HackVisitor visitor) {
-    visitor.visitListExpression(this);
+    visitor.visitXhpAttributeExpression(this);
   }
 
   @Override
@@ -28,9 +28,15 @@ public class HackListExpressionImpl extends HackExpressionImpl implements HackLi
   }
 
   @Override
-  @NotNull
-  public List<HackExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, HackExpression.class);
+  @Nullable
+  public HackXhpCategoryIdentifier getXhpCategoryIdentifier() {
+    return findChildByClass(HackXhpCategoryIdentifier.class);
+  }
+
+  @Override
+  @Nullable
+  public HackXhpClassIdentifier getXhpClassIdentifier() {
+    return findChildByClass(HackXhpClassIdentifier.class);
   }
 
 }

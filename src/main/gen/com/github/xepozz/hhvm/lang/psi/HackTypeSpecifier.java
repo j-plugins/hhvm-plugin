@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface HackTypeSpecifier extends PsiElement {
 
   @Nullable
-  HackQualifiedIdentifierExpression getQualifiedIdentifierExpression();
+  HackExpression getExpression();
 
   @Nullable
   HackTypeArguments getTypeArguments();

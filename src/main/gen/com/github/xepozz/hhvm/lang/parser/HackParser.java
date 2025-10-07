@@ -49,7 +49,9 @@ public class HackParser implements PsiParser, LightPsiParser {
       PARENTHESIZED_EXPRESSION, PIPE_VARIABLE_EXPRESSION, POSTFIX_UNARY_EXPRESSION, PREFIXED_STRING_EXPRESSION,
       PREFIX_UNARY_EXPRESSION, QUALIFIED_IDENTIFIER_EXPRESSION, REQUIRE_EXPRESSION, SCOPED_IDENTIFIER_EXPRESSION,
       SCOPE_IDENTIFIER_EXPRESSION, SELECTION_EXPRESSION, SHAPE_EXPRESSION, SUBSCRIPT_EXPRESSION,
-      TERNARY_EXPRESSION, TUPLE_EXPRESSION, VARIABLE_EXPRESSION, YIELD_EXPRESSION),
+      TERNARY_EXPRESSION, TUPLE_EXPRESSION, VARIABLE_EXPRESSION, XHP_ATTRIBUTE_EXPRESSION,
+      XHP_BINARY_EXPRESSION, XHP_EXPRESSION, XHP_IDENTIFIER_EXPRESSION, XHP_PARENTHESIZED_EXPRESSION,
+      XHP_POSTFIX_UNARY_EXPRESSION, XHP_SPREAD_EXPRESSION, YIELD_EXPRESSION),
   };
 
   /* ********************************************************** */
@@ -654,7 +656,7 @@ public class HackParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // attribute_modifier? class_modifier? class_modifier? T_CLASS ( identifier ) type_parameters? extends_clause? implements_clause? where_clause? member_declarations
+  // attribute_modifier? class_modifier? class_modifier? xhp_modifier? T_CLASS ( identifier | xhp_identifier_expression ) type_parameters? extends_clause? implements_clause? where_clause? member_declarations
   public static boolean class_declaration(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_declaration")) return false;
     boolean r;
@@ -662,12 +664,13 @@ public class HackParser implements PsiParser, LightPsiParser {
     r = class_declaration_0(b, l + 1);
     r = r && class_declaration_1(b, l + 1);
     r = r && class_declaration_2(b, l + 1);
+    r = r && class_declaration_3(b, l + 1);
     r = r && consumeToken(b, T_CLASS);
-    r = r && consumeToken(b, IDENTIFIER);
     r = r && class_declaration_5(b, l + 1);
     r = r && class_declaration_6(b, l + 1);
     r = r && class_declaration_7(b, l + 1);
     r = r && class_declaration_8(b, l + 1);
+    r = r && class_declaration_9(b, l + 1);
     r = r && member_declarations(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -694,30 +697,46 @@ public class HackParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // type_parameters?
+  // xhp_modifier?
+  private static boolean class_declaration_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_declaration_3")) return false;
+    xhp_modifier(b, l + 1);
+    return true;
+  }
+
+  // identifier | xhp_identifier_expression
   private static boolean class_declaration_5(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "class_declaration_5")) return false;
+    boolean r;
+    r = consumeToken(b, IDENTIFIER);
+    if (!r) r = xhp_identifier_expression(b, l + 1);
+    return r;
+  }
+
+  // type_parameters?
+  private static boolean class_declaration_6(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_declaration_6")) return false;
     type_parameters(b, l + 1);
     return true;
   }
 
   // extends_clause?
-  private static boolean class_declaration_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_declaration_6")) return false;
+  private static boolean class_declaration_7(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_declaration_7")) return false;
     extends_clause(b, l + 1);
     return true;
   }
 
   // implements_clause?
-  private static boolean class_declaration_7(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_declaration_7")) return false;
+  private static boolean class_declaration_8(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_declaration_8")) return false;
     implements_clause(b, l + 1);
     return true;
   }
 
   // where_clause?
-  private static boolean class_declaration_8(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "class_declaration_8")) return false;
+  private static boolean class_declaration_9(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "class_declaration_9")) return false;
     where_clause(b, l + 1);
     return true;
   }
@@ -1926,7 +1945,7 @@ public class HackParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // T_LBRACE ( class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause )* T_RBRACE
+  // T_LBRACE ( class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause | xhp_attribute_declaration | xhp_children_declaration | xhp_category_declaration )* T_RBRACE
   public static boolean member_declarations(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "member_declarations")) return false;
     if (!nextTokenIs(b, T_LBRACE)) return false;
@@ -1939,7 +1958,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // ( class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause )*
+  // ( class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause | xhp_attribute_declaration | xhp_children_declaration | xhp_category_declaration )*
   private static boolean member_declarations_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "member_declarations_1")) return false;
     while (true) {
@@ -1950,7 +1969,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause
+  // class_const_declaration | method_declaration | property_declaration | type_const_declaration | context_const_declaration | trait_use_clause | require_implements_clause | require_extends_clause | xhp_attribute_declaration | xhp_children_declaration | xhp_category_declaration
   private static boolean member_declarations_1_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "member_declarations_1_0")) return false;
     boolean r;
@@ -1962,6 +1981,9 @@ public class HackParser implements PsiParser, LightPsiParser {
     if (!r) r = trait_use_clause(b, l + 1);
     if (!r) r = require_implements_clause(b, l + 1);
     if (!r) r = require_extends_clause(b, l + 1);
+    if (!r) r = xhp_attribute_declaration(b, l + 1);
+    if (!r) r = xhp_children_declaration(b, l + 1);
+    if (!r) r = xhp_category_declaration(b, l + 1);
     return r;
   }
 
@@ -3430,7 +3452,7 @@ public class HackParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // type_modifier* ( primitive_type | qualified_identifier_expression | collection_type ) type_arguments?
+  // type_modifier* ( primitive_type | qualified_identifier_expression | collection_type | xhp_identifier_expression ) type_arguments?
   public static boolean type_specifier(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_specifier")) return false;
     boolean r;
@@ -3453,13 +3475,14 @@ public class HackParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // primitive_type | qualified_identifier_expression | collection_type
+  // primitive_type | qualified_identifier_expression | collection_type | xhp_identifier_expression
   private static boolean type_specifier_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "type_specifier_1")) return false;
     boolean r;
     r = primitive_type(b, l + 1);
     if (!r) r = qualified_identifier_expression(b, l + 1);
     if (!r) r = collection_type(b, l + 1);
+    if (!r) r = xhp_identifier_expression(b, l + 1);
     return r;
   }
 
@@ -3898,6 +3921,499 @@ public class HackParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // xhp_identifier_expression T_EQ ( string | braced_expression )
+  // 	| braced_expression
+  // 	| xhp_spread_expression
+  public static boolean xhp_attribute(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_attribute")) return false;
+    if (!nextTokenIs(b, "<xhp attribute>", T_LBRACE, XHP_IDENTIFIER_VALUE)) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, XHP_ATTRIBUTE, "<xhp attribute>");
+    r = xhp_attribute_0(b, l + 1);
+    if (!r) r = braced_expression(b, l + 1);
+    if (!r) r = xhp_spread_expression(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // xhp_identifier_expression T_EQ ( string | braced_expression )
+  private static boolean xhp_attribute_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_attribute_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = xhp_identifier_expression(b, l + 1);
+    r = r && consumeToken(b, T_EQ);
+    r = r && xhp_attribute_0_2(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // string | braced_expression
+  private static boolean xhp_attribute_0_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_attribute_0_2")) return false;
+    boolean r;
+    r = consumeToken(b, STRING);
+    if (!r) r = braced_expression(b, l + 1);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_ATTRIBUTE xhp_class_attribute ( T_COMMA xhp_class_attribute )* T_SEMICOLON
+  public static boolean xhp_attribute_declaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_attribute_declaration")) return false;
+    if (!nextTokenIs(b, T_ATTRIBUTE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_ATTRIBUTE);
+    r = r && xhp_class_attribute(b, l + 1);
+    r = r && xhp_attribute_declaration_2(b, l + 1);
+    r = r && consumeToken(b, T_SEMICOLON);
+    exit_section_(b, m, XHP_ATTRIBUTE_DECLARATION, r);
+    return r;
+  }
+
+  // ( T_COMMA xhp_class_attribute )*
+  private static boolean xhp_attribute_declaration_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_attribute_declaration_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_attribute_declaration_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_attribute_declaration_2", c)) break;
+    }
+    return true;
+  }
+
+  // T_COMMA xhp_class_attribute
+  private static boolean xhp_attribute_declaration_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_attribute_declaration_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_COMMA);
+    r = r && xhp_class_attribute(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // xhp_identifier_expression
+  // 	| xhp_class_identifier
+  // 	| xhp_category_identifier
+  // //	| xhp_binary_expression
+  // //	| xhp_postfix_unary_expression
+  // 	| xhp_parenthesized_expression
+  public static boolean xhp_attribute_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_attribute_expression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _COLLAPSE_, XHP_ATTRIBUTE_EXPRESSION, "<xhp attribute expression>");
+    r = xhp_identifier_expression(b, l + 1);
+    if (!r) r = xhp_class_identifier(b, l + 1);
+    if (!r) r = xhp_category_identifier(b, l + 1);
+    if (!r) r = xhp_parenthesized_expression(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // xhp_attribute_expression T_BIT_OR xhp_attribute_expression
+  public static boolean xhp_binary_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_binary_expression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, XHP_BINARY_EXPRESSION, "<xhp binary expression>");
+    r = xhp_attribute_expression(b, l + 1);
+    r = r && consumeToken(b, T_BIT_OR);
+    r = r && xhp_attribute_expression(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_CATEGORY xhp_category_identifier ( T_COMMA xhp_category_identifier )* T_SEMICOLON
+  public static boolean xhp_category_declaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_category_declaration")) return false;
+    if (!nextTokenIs(b, T_CATEGORY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_CATEGORY);
+    r = r && xhp_category_identifier(b, l + 1);
+    r = r && xhp_category_declaration_2(b, l + 1);
+    r = r && consumeToken(b, T_SEMICOLON);
+    exit_section_(b, m, XHP_CATEGORY_DECLARATION, r);
+    return r;
+  }
+
+  // ( T_COMMA xhp_category_identifier )*
+  private static boolean xhp_category_declaration_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_category_declaration_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_category_declaration_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_category_declaration_2", c)) break;
+    }
+    return true;
+  }
+
+  // T_COMMA xhp_category_identifier
+  private static boolean xhp_category_declaration_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_category_declaration_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_COMMA);
+    r = r && xhp_category_identifier(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_PERCENT XHP_IDENTIFIER_VALUE
+  public static boolean xhp_category_identifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_category_identifier")) return false;
+    if (!nextTokenIs(b, T_PERCENT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, T_PERCENT, XHP_IDENTIFIER_VALUE);
+    exit_section_(b, m, XHP_CATEGORY_IDENTIFIER, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_CHILDREN xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_SEMICOLON
+  public static boolean xhp_children_declaration(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_children_declaration")) return false;
+    if (!nextTokenIs(b, T_CHILDREN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_CHILDREN);
+    r = r && xhp_attribute_expression(b, l + 1);
+    r = r && xhp_children_declaration_2(b, l + 1);
+    r = r && consumeToken(b, T_SEMICOLON);
+    exit_section_(b, m, XHP_CHILDREN_DECLARATION, r);
+    return r;
+  }
+
+  // ( T_COMMA xhp_attribute_expression )*
+  private static boolean xhp_children_declaration_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_children_declaration_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_children_declaration_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_children_declaration_2", c)) break;
+    }
+    return true;
+  }
+
+  // T_COMMA xhp_attribute_expression
+  private static boolean xhp_children_declaration_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_children_declaration_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_COMMA);
+    r = r && xhp_attribute_expression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ( type | xhp_enum_type ) xhp_identifier_expression? ( T_EQ expression )? ( T_AT_REQUIRED | T_AT_LATEINIT )?
+  public static boolean xhp_class_attribute(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_attribute")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, XHP_CLASS_ATTRIBUTE, "<xhp class attribute>");
+    r = xhp_class_attribute_0(b, l + 1);
+    r = r && xhp_class_attribute_1(b, l + 1);
+    r = r && xhp_class_attribute_2(b, l + 1);
+    r = r && xhp_class_attribute_3(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // type | xhp_enum_type
+  private static boolean xhp_class_attribute_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_attribute_0")) return false;
+    boolean r;
+    r = type(b, l + 1);
+    if (!r) r = xhp_enum_type(b, l + 1);
+    return r;
+  }
+
+  // xhp_identifier_expression?
+  private static boolean xhp_class_attribute_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_attribute_1")) return false;
+    xhp_identifier_expression(b, l + 1);
+    return true;
+  }
+
+  // ( T_EQ expression )?
+  private static boolean xhp_class_attribute_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_attribute_2")) return false;
+    xhp_class_attribute_2_0(b, l + 1);
+    return true;
+  }
+
+  // T_EQ expression
+  private static boolean xhp_class_attribute_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_attribute_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_EQ);
+    r = r && expression(b, l + 1, -1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // ( T_AT_REQUIRED | T_AT_LATEINIT )?
+  private static boolean xhp_class_attribute_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_attribute_3")) return false;
+    xhp_class_attribute_3_0(b, l + 1);
+    return true;
+  }
+
+  // T_AT_REQUIRED | T_AT_LATEINIT
+  private static boolean xhp_class_attribute_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_attribute_3_0")) return false;
+    boolean r;
+    r = consumeToken(b, T_AT_REQUIRED);
+    if (!r) r = consumeToken(b, T_AT_LATEINIT);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_COLON XHP_IDENTIFIER_VALUE
+  public static boolean xhp_class_identifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_class_identifier")) return false;
+    if (!nextTokenIs(b, T_COLON)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, T_COLON, XHP_IDENTIFIER_VALUE);
+    exit_section_(b, m, XHP_CLASS_IDENTIFIER, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_LT_SLASH xhp_identifier_expression T_GT
+  public static boolean xhp_close(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_close")) return false;
+    if (!nextTokenIs(b, T_LT_SLASH)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_LT_SLASH);
+    r = r && xhp_identifier_expression(b, l + 1);
+    r = r && consumeToken(b, T_GT);
+    exit_section_(b, m, XHP_CLOSE, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_ENUM T_LBRACE ( string | integer ) ( T_COMMA ( string | integer ) )* T_COMMA? T_RBRACE
+  public static boolean xhp_enum_type(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_enum_type")) return false;
+    if (!nextTokenIs(b, T_ENUM)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, T_ENUM, T_LBRACE);
+    r = r && xhp_enum_type_2(b, l + 1);
+    r = r && xhp_enum_type_3(b, l + 1);
+    r = r && xhp_enum_type_4(b, l + 1);
+    r = r && consumeToken(b, T_RBRACE);
+    exit_section_(b, m, XHP_ENUM_TYPE, r);
+    return r;
+  }
+
+  // string | integer
+  private static boolean xhp_enum_type_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_enum_type_2")) return false;
+    boolean r;
+    r = consumeToken(b, STRING);
+    if (!r) r = consumeToken(b, INTEGER);
+    return r;
+  }
+
+  // ( T_COMMA ( string | integer ) )*
+  private static boolean xhp_enum_type_3(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_enum_type_3")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_enum_type_3_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_enum_type_3", c)) break;
+    }
+    return true;
+  }
+
+  // T_COMMA ( string | integer )
+  private static boolean xhp_enum_type_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_enum_type_3_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_COMMA);
+    r = r && xhp_enum_type_3_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // string | integer
+  private static boolean xhp_enum_type_3_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_enum_type_3_0_1")) return false;
+    boolean r;
+    r = consumeToken(b, STRING);
+    if (!r) r = consumeToken(b, INTEGER);
+    return r;
+  }
+
+  // T_COMMA?
+  private static boolean xhp_enum_type_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_enum_type_4")) return false;
+    consumeToken(b, T_COMMA);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // T_XHP
+  public static boolean xhp_modifier(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_modifier")) return false;
+    if (!nextTokenIs(b, T_XHP)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_XHP);
+    exit_section_(b, m, XHP_MODIFIER, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_LT xhp_identifier_expression xhp_attribute* T_GT
+  public static boolean xhp_open(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_open")) return false;
+    if (!nextTokenIs(b, T_LT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_LT);
+    r = r && xhp_identifier_expression(b, l + 1);
+    r = r && xhp_open_2(b, l + 1);
+    r = r && consumeToken(b, T_GT);
+    exit_section_(b, m, XHP_OPEN, r);
+    return r;
+  }
+
+  // xhp_attribute*
+  private static boolean xhp_open_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_open_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_attribute(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_open_2", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // T_LT xhp_identifier_expression xhp_attribute* T_SLASH_GT
+  public static boolean xhp_open_close(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_open_close")) return false;
+    if (!nextTokenIs(b, T_LT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_LT);
+    r = r && xhp_identifier_expression(b, l + 1);
+    r = r && xhp_open_close_2(b, l + 1);
+    r = r && consumeToken(b, T_SLASH_GT);
+    exit_section_(b, m, XHP_OPEN_CLOSE, r);
+    return r;
+  }
+
+  // xhp_attribute*
+  private static boolean xhp_open_close_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_open_close_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_attribute(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_open_close_2", c)) break;
+    }
+    return true;
+  }
+
+  /* ********************************************************** */
+  // T_LPAREN xhp_attribute_expression ( T_COMMA xhp_attribute_expression )* T_RPAREN
+  public static boolean xhp_parenthesized_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_parenthesized_expression")) return false;
+    if (!nextTokenIs(b, T_LPAREN)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_LPAREN);
+    r = r && xhp_attribute_expression(b, l + 1);
+    r = r && xhp_parenthesized_expression_2(b, l + 1);
+    r = r && consumeToken(b, T_RPAREN);
+    exit_section_(b, m, XHP_PARENTHESIZED_EXPRESSION, r);
+    return r;
+  }
+
+  // ( T_COMMA xhp_attribute_expression )*
+  private static boolean xhp_parenthesized_expression_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_parenthesized_expression_2")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_parenthesized_expression_2_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_parenthesized_expression_2", c)) break;
+    }
+    return true;
+  }
+
+  // T_COMMA xhp_attribute_expression
+  private static boolean xhp_parenthesized_expression_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_parenthesized_expression_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, T_COMMA);
+    r = r && xhp_attribute_expression(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // xhp_attribute_expression ( T_PLUS | T_MUL | T_QM )
+  public static boolean xhp_postfix_unary_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_postfix_unary_expression")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _COLLAPSE_, XHP_POSTFIX_UNARY_EXPRESSION, "<xhp postfix unary expression>");
+    r = xhp_attribute_expression(b, l + 1);
+    r = r && xhp_postfix_unary_expression_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // T_PLUS | T_MUL | T_QM
+  private static boolean xhp_postfix_unary_expression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_postfix_unary_expression_1")) return false;
+    boolean r;
+    r = consumeToken(b, T_PLUS);
+    if (!r) r = consumeToken(b, T_MUL);
+    if (!r) r = consumeToken(b, T_QM);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // T_LBRACE T_THREE_DOTS expression T_RBRACE
+  public static boolean xhp_spread_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_spread_expression")) return false;
+    if (!nextTokenIs(b, T_LBRACE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokens(b, 0, T_LBRACE, T_THREE_DOTS);
+    r = r && expression(b, l + 1, -1);
+    r = r && consumeToken(b, T_RBRACE);
+    exit_section_(b, m, XHP_SPREAD_EXPRESSION, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // ( "regexp:( [^<{]+ )" )
+  public static boolean xhp_string(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_string")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, XHP_STRING, "<xhp string>");
+    r = consumeToken(b, "regexp:( [^<{]+ )");
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // Expression root: expression
   // Operator priority table:
   // 0: ATOM(array_expression)
@@ -3907,7 +4423,7 @@ public class HackParser implements PsiParser, LightPsiParser {
   // 4: ATOM(literal_expression)
   // 5: ATOM(variable_expression) ATOM(pipe_variable_expression) ATOM(list_expression) POSTFIX(subscript_expression)
   //    ATOM(qualified_identifier_expression) PREFIX(parenthesized_expression) ATOM(collection_call_expression) POSTFIX(expression_call_expression)
-  //    ATOM(scoped_identifier_expression) ATOM(scope_identifier_expression) POSTFIX(selection_expression)
+  //    ATOM(scoped_identifier_expression) ATOM(scope_identifier_expression) POSTFIX(selection_expression) ATOM(xhp_identifier_expression)
   // 6: ATOM(expression_tree_expression)
   // 7: ATOM(prefixed_string_expression)
   // 8: BINARY(binary_expression)
@@ -3924,8 +4440,9 @@ public class HackParser implements PsiParser, LightPsiParser {
   // 19: PREFIX(include_expression)
   // 20: PREFIX(require_expression)
   // 21: ATOM(anonymous_function_expression)
-  // 22: ATOM(function_pointer_expression)
-  // 23: ATOM(enum_class_label_expression)
+  // 22: ATOM(xhp_expression)
+  // 23: ATOM(function_pointer_expression)
+  // 24: ATOM(enum_class_label_expression)
   public static boolean expression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "expression")) return false;
     addVariant(b, "<expression>");
@@ -3943,6 +4460,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     if (!r) r = collection_call_expression(b, l + 1);
     if (!r) r = scoped_identifier_expression(b, l + 1);
     if (!r) r = scope_identifier_expression(b, l + 1);
+    if (!r) r = xhp_identifier_expression(b, l + 1);
     if (!r) r = expression_tree_expression(b, l + 1);
     if (!r) r = prefixed_string_expression(b, l + 1);
     if (!r) r = prefix_unary_expression(b, l + 1);
@@ -3954,6 +4472,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     if (!r) r = include_expression(b, l + 1);
     if (!r) r = require_expression(b, l + 1);
     if (!r) r = anonymous_function_expression(b, l + 1);
+    if (!r) r = xhp_expression(b, l + 1);
     if (!r) r = function_pointer_expression(b, l + 1);
     if (!r) r = enum_class_label_expression(b, l + 1);
     p = r;
@@ -4540,7 +5059,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // ( qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression ) T_COLON_COLON ( identifier | variable_expression )
+  // ( qualified_identifier_expression | variable_expression | scope_identifier_expression | xhp_identifier_expression | pipe_variable_expression ) T_COLON_COLON ( identifier | variable_expression )
   public static boolean scoped_identifier_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "scoped_identifier_expression")) return false;
     boolean r;
@@ -4552,13 +5071,14 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // qualified_identifier_expression | variable_expression | scope_identifier_expression | pipe_variable_expression
+  // qualified_identifier_expression | variable_expression | scope_identifier_expression | xhp_identifier_expression | pipe_variable_expression
   private static boolean scoped_identifier_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "scoped_identifier_expression_0")) return false;
     boolean r;
     r = qualified_identifier_expression(b, l + 1);
     if (!r) r = variable_expression(b, l + 1);
     if (!r) r = scope_identifier_expression(b, l + 1);
+    if (!r) r = xhp_identifier_expression(b, l + 1);
     if (!r) r = pipe_variable_expression(b, l + 1);
     return r;
   }
@@ -4616,6 +5136,17 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
+  // XHP_IDENTIFIER_VALUE
+  public static boolean xhp_identifier_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_identifier_expression")) return false;
+    if (!nextTokenIsSmart(b, XHP_IDENTIFIER_VALUE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeTokenSmart(b, XHP_IDENTIFIER_VALUE);
+    exit_section_(b, m, XHP_IDENTIFIER_EXPRESSION, r);
+    return r;
+  }
+
   // identifier EXPRESSION_TREE_IDENTIFIER
   public static boolean expression_tree_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expression_tree_expression")) return false;
@@ -4638,7 +5169,7 @@ public class HackParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '|>'
+  // T_OR_GT
   // 	 | T_QQ
   // 	 | T_OR
   // 	 | T_AND
@@ -4681,7 +5212,7 @@ public class HackParser implements PsiParser, LightPsiParser {
   private static boolean binary_expression_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binary_expression_0")) return false;
     boolean r;
-    r = consumeTokenSmart(b, "|>");
+    r = consumeTokenSmart(b, T_OR_GT);
     if (!r) r = consumeTokenSmart(b, T_QQ);
     if (!r) r = consumeTokenSmart(b, T_OR);
     if (!r) r = consumeTokenSmart(b, T_AND);
@@ -5194,6 +5725,53 @@ public class HackParser implements PsiParser, LightPsiParser {
     if (!recursion_guard_(b, l, "anonymous_function_expression_5")) return false;
     anonymous_function_use_clause(b, l + 1);
     return true;
+  }
+
+  // xhp_open_close
+  // 	| xhp_open ( xhp_string | XHP_COMMENT | braced_expression | xhp_expression )* xhp_close
+  public static boolean xhp_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_expression")) return false;
+    if (!nextTokenIsSmart(b, T_LT)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = xhp_open_close(b, l + 1);
+    if (!r) r = xhp_expression_1(b, l + 1);
+    exit_section_(b, m, XHP_EXPRESSION, r);
+    return r;
+  }
+
+  // xhp_open ( xhp_string | XHP_COMMENT | braced_expression | xhp_expression )* xhp_close
+  private static boolean xhp_expression_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_expression_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = xhp_open(b, l + 1);
+    r = r && xhp_expression_1_1(b, l + 1);
+    r = r && xhp_close(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // ( xhp_string | XHP_COMMENT | braced_expression | xhp_expression )*
+  private static boolean xhp_expression_1_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_expression_1_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!xhp_expression_1_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "xhp_expression_1_1", c)) break;
+    }
+    return true;
+  }
+
+  // xhp_string | XHP_COMMENT | braced_expression | xhp_expression
+  private static boolean xhp_expression_1_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "xhp_expression_1_1_0")) return false;
+    boolean r;
+    r = xhp_string(b, l + 1);
+    if (!r) r = consumeTokenSmart(b, XHP_COMMENT);
+    if (!r) r = braced_expression(b, l + 1);
+    if (!r) r = xhp_expression(b, l + 1);
+    return r;
   }
 
   // ( scoped_identifier_expression | qualified_identifier_expression ) type_arguments

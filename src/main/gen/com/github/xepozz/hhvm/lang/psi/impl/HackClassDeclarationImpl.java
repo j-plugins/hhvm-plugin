@@ -76,9 +76,21 @@ public class HackClassDeclarationImpl extends ASTWrapperPsiElement implements Ha
   }
 
   @Override
-  @NotNull
+  @Nullable
+  public HackXhpIdentifierExpression getXhpIdentifierExpression() {
+    return findChildByClass(HackXhpIdentifierExpression.class);
+  }
+
+  @Override
+  @Nullable
+  public HackXhpModifier getXhpModifier() {
+    return findChildByClass(HackXhpModifier.class);
+  }
+
+  @Override
+  @Nullable
   public PsiElement getIdentifier() {
-    return findNotNullChildByType(IDENTIFIER);
+    return findChildByType(IDENTIFIER);
   }
 
 }

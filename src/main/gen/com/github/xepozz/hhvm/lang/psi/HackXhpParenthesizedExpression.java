@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface HackListExpression extends HackExpression {
+public interface HackXhpParenthesizedExpression extends HackExpression {
 
   @NotNull
   List<HackExpression> getExpressionList();
