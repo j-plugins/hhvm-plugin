@@ -3,6 +3,7 @@
 
 //    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 //    extends(".*statement")=statement
+//    extends(".*selection_expression")=selection_expression
     extends(".*expression")=expression
 
   psiClassPrefix="Hack"
@@ -209,10 +210,10 @@ private variablish_expression ::=
 //	| call_expression
 	| scoped_identifier_expression
 	| scope_identifier_expression
-//	| selection_expression
+	| selection_expression
 //	| xhp_identifier
 
-private statement ::=
+statement ::=
 	 declaration
 	| module_attribute
 	| compound_statement
@@ -280,8 +281,8 @@ expression ::=
 	| cast_expression
 	| ternary_expression
 	| lambda_expression
-//	| call_expression
-//	| selection_expression
+	| call_expression
+	| selection_expression
 	| new_expression
 	| include_expression
 	| require_expression
@@ -582,6 +583,13 @@ private single_parameter ::=
 //call_expression ::=
 //	 ( expression | collection_type ) type_arguments? arguments
 
+private call_expression ::=
+	 call_callable_expression
+	 | call_collection_expression
+
+call_callable_expression ::= expression type_arguments? arguments
+call_collection_expression ::= collection_type type_arguments? arguments
+
 //call_expression ::=
 //	 (collection_type type_arguments? arguments)
 //	 | (expression type_arguments? arguments)
@@ -597,6 +605,41 @@ argument ::=
 
 //selection_expression ::=
 //	 ( variablish_expression | as_expression ) ( '?->' | '->' ) ( variablish_expression | braced_expression | keyword )
+
+selection_expression ::= expression ('?->' | '->') (variablish_expression | braced_expression | keyword)
+
+//selection_expression ::=
+//    left_selection_expression ( '?->' | '->' ) right_selection_expression
+
+//	 ( variablish_expression | as_expression ) ( '?->' | '->' ) ( variablish_expression | braced_expression | keyword )
+
+
+//selection_expression ::=
+//	 n1_selection_expression
+//	 |	n2_selection_expression
+//	 |	n3_selection_expression
+//	 |	n4_selection_expression
+//	 |	n5_selection_expression
+//	 |	n6_selection_expression
+//
+//n1_selection_expression ::= variablish_expression ('?->' | '->') variablish_expression
+//n2_selection_expression ::= variablish_expression ('?->' | '->') braced_expression
+//n3_selection_expression ::= variablish_expression ('?->' | '->') keyword
+//
+//n4_selection_expression ::= as_expression ('?->' | '->') variablish_expression
+//n5_selection_expression ::= as_expression ('?->' | '->') braced_expression
+//n6_selection_expression ::= as_expression ('?->' | '->') keyword
+
+
+//selection_expression ::=
+//	 left_selection_expression ('?->' | '->') right_selection_expression
+//
+//private group_selection_expression ::=
+//	 left_selection_expression ('?->' | '->') right_selection_expression
+//
+//private left_selection_expression ::= variablish_expression | as_expression
+//private right_selection_expression ::= variablish_expression | braced_expression | keyword
+
 
 alias_declaration ::=
 	 attribute_modifier? ( T_TYPE | T_NEWTYPE ) identifier type_parameters? ( T_AS type )? T_EQ type T_SEMICOLON
